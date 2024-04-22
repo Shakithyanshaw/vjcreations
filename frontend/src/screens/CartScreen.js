@@ -6,7 +6,7 @@ import Col from 'react-bootstrap/Col';
 import MessageBox from '../components/MessageBox';
 import { Link, useNavigate } from 'react-router-dom';
 import ListGroup from 'react-bootstrap/ListGroup';
-import ListGroupItem from 'react-bootstrap/esm/ListGroupItem';
+import { ListGroupItem } from 'react-bootstrap';
 import Button from 'react-bootstrap/esm/Button';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
@@ -61,7 +61,7 @@ export default function CartScreen() {
                         alt={item.name}
                         className="img-fluid rounded img-thumbnail"
                       ></img>{' '}
-                      <Link to={`/product/${item.slug}`}>{item.name}</Link>
+                      <Link to={`/product/${item._id}`}>{item.name}</Link>
                     </Col>
                     <Col md={3}>
                       <Button
@@ -114,7 +114,7 @@ export default function CartScreen() {
                   <div className="d-grid">
                     <Button
                       type="button"
-                      varient="primary"
+                      variant="primary"
                       onClick={checkoutHandler}
                       disabled={cartItems.length === 0}
                     >
