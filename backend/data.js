@@ -18,10 +18,10 @@ const data = {
   products: [
     {
       //_id: '1',
-      name: 'Wedding Decoration-Gold Package',
+      name: 'Wedding Decoration',
       slug: 'Decorations',
       category: 'Decorations',
-      image: '/images/a1.jpg', // 679px × 829px
+      image: '/images/deco.jpg', // 679px × 829px
       price: 120000,
       countInStock: 10,
       brand: 'VJ-Creations',
@@ -31,10 +31,11 @@ const data = {
     },
     {
       //_id: '2',
-      name: 'Personal Bridel Party Makeup for Girls',
+      name: 'Bridel Makeup',
       slug: 'Makeup',
       category: 'Makeup',
-      image: '/images/a2.jpg',
+      image:
+        'https://res.cloudinary.com/djq0pgqp3/image/upload/v1672891950/wcgs2w2alpvx0tfofhbp.jpg',
       price: 75000,
       countInStock: 0,
       brand: 'Evergreen Makeup',
@@ -48,7 +49,7 @@ const data = {
       name: 'DJ Music',
       slug: 'DJ Music',
       category: 'DJ Music',
-      image: '/images/a3.jpg',
+      image: '/images/djmusic.jpg',
       price: 65000,
       countInStock: 15,
       brand: 'DJBLACK',
@@ -59,10 +60,10 @@ const data = {
     },
     {
       //_id: '4',
-      name: 'Luxury Wedding Hall with AC ',
+      name: 'Wedding Hall',
       slug: 'Hall',
       category: 'Wedding Hall',
-      image: '/images/a4.jpg',
+      image: '/images/weddinghall.jpg',
       price: 365000,
       countInStock: 5,
       brand: 'AMARI',
@@ -73,10 +74,11 @@ const data = {
     },
     {
       //_id: '5',
-      name: 'Outdoor Photography',
+      name: 'Photography',
       slug: 'photography',
       category: 'photography',
-      image: '/images/a1.jpg', // 679px × 829px
+      image:
+        'https://res.cloudinary.com/djq0pgqp3/image/upload/v1678081179/c4ni3omgq4rtzpv1ztwt.jpg', // 679px × 829px
       price: 150000,
       countInStock: 10,
       brand: 'VJ-Creations',
@@ -90,7 +92,8 @@ const data = {
       name: 'Birthday Card',
       slug: 'Birthday Card',
       category: 'Gifts',
-      image: '/images/a2.jpg',
+      image:
+        'https://res.cloudinary.com/djq0pgqp3/image/upload/v1672891485/o01sftk9al1zklohckwg.jpg',
       price: 250,
       countInStock: 20,
       brand: 'VJ-Creations',
@@ -104,7 +107,8 @@ const data = {
       name: 'Church Wedding Decoration',
       slug: 'wedding-deco',
       category: 'Decorations',
-      image: '/images/a3.jpg',
+      image:
+        'https://res.cloudinary.com/djq0pgqp3/image/upload/v1672891277/lmw8btfozn5zenkud0uq.jpg',
       price: 150000,
       countInStock: 15,
       brand: 'VJ-Creations',
@@ -118,7 +122,8 @@ const data = {
       name: 'Catering',
       slug: 'Catering',
       category: 'Catering',
-      image: '/images/a4.jpg',
+      image:
+        'https://res.cloudinary.com/djq0pgqp3/image/upload/v1678068498/qxpiecx5vdpkprdvezq2.jpg',
       price: 45000,
       countInStock: 5,
       brand: 'VJ-Creations',
@@ -126,20 +131,6 @@ const data = {
       numReviews: 10,
       description:
         'Catering services provide food and beverage provisions for various events and occasions',
-    },
-    {
-      //_id: '6',
-      name: 'Birthday Card',
-      slug: 'Birthday Card',
-      category: 'Gifts',
-      image: '/images/a2.jpg',
-      price: 250,
-      countInStock: 20,
-      brand: 'VJ-Creations',
-      rating: 4.0,
-      numReviews: 10,
-      description:
-        'Send your wishes to your loved ones along with this personalized and heart-warming handmade greeting card.  Your personal message will be hand-written inside of the card.',
     },
   ],
 };

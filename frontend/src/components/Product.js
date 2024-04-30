@@ -41,10 +41,10 @@ function Product(props) {
         <Card.Text>Rs{product.price}</Card.Text>
         {product.countInStock === 0 ? (
           <Button varient="light" disabled>
-            Out Of Stock
+            Un-Avaiable
           </Button>
         ) : (
-          <Button onClick={() => addToCartHandler(product)}>Add to Cart</Button>
+          <Button onClick={() => addToCartHandler(product)}>Book Now</Button>
         )}
       </Card.Body>
     </Card>
