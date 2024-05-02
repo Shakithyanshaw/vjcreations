@@ -12,10 +12,10 @@ import Col from 'react-bootstrap/Col';
 
 export default function SignupScreen() {
   const navigate = useNavigate();
-  const [setValidated] = useState(false);
   const { search } = useLocation();
   const redirectInUrl = new URLSearchParams(search).get('redirect');
   const redirect = redirectInUrl ? redirectInUrl : `/`;
+  const [validated, setValidated] = useState(false);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

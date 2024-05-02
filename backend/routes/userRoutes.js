@@ -16,6 +16,9 @@ userRouter.post(
           _id: user._id,
           name: user.name,
           email: user.email,
+          mobileNo: user.mobileNo,
+          city: user.city,
+          address: user.address,
           isAdmin: user.isAdmin,
           token: generateToken(user),
         });
@@ -32,6 +35,9 @@ userRouter.post(
     const newUser = new User({
       name: req.body.name,
       email: req.body.email,
+      mobileNo: req.body.mobileNo,
+      city: req.body.city,
+      address: req.body.address,
       password: bcrypt.hashSync(req.body.password),
     });
     const user = await newUser.save();
@@ -39,6 +45,9 @@ userRouter.post(
       _id: user._id,
       name: user.name,
       email: user.email,
+      mobileNo: user.mobileNo,
+      city: user.city,
+      address: user.address,
       isAdmin: user.isAdmin,
       token: generateToken(user),
     });
