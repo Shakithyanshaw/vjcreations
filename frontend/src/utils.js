@@ -1,5 +1,6 @@
 export const getError = (error) => {
-  return error.response && error.response.data.message
-    ? error.response.data.message
-    : error.message;
+  if (error.response && error.response.data.message) {
+    return error.response.data.message;
+  }
+  return error.message || error.toString();
 };

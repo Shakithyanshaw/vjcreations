@@ -14,7 +14,8 @@ main {
   flex: 1;
 }
 
-.btn-primary {
+.btn-primary,
+.btn-outline-primary {
   background-color: #ffc000;
   color: black;
 }
@@ -62,4 +63,30 @@ main {
 .checkout-steps > div.active {
   border-bottom: 0.7rem solid #229cac;
   color: #000000;
+}
+
+/* sidebar */
+.navbar-brand {
+  font-weight: bold;
+}
+.side-navbar {
+  width: 200px;
+  height: 100%;
+  position: absolute;
+  left: -300px;
+  background-color: #100901;
+  transition: 0.8s;
+}
+
+.site-container {
+  transition: 0.5s;
+}
+.active-cont {
+  margin-left: 200px;
+}
+.active-nav {
+  left: 0;
+}
+.text-bold {
+  font-weight: bold;
 }
