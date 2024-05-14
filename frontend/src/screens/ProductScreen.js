@@ -116,7 +116,7 @@ function ProductScreen() {
                     <Col>Status:</Col>
                     <Col>
                       {product.countInStock > 0 ? (
-                        <Badge bg="success">In Stock</Badge>
+                        <Badge bg="success">Available</Badge>
                       ) : (
                         <Badge bg="danger">Unavailable</Badge>
                       )}
@@ -128,7 +128,7 @@ function ProductScreen() {
                   <ListGroup.Item>
                     <div className="d-grid">
                       <Button onClick={addToCartHandler} variant="primary">
-                        Add To Card
+                        Book Now
                       </Button>
                     </div>
                   </ListGroup.Item>

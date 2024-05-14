@@ -21,7 +21,7 @@ export default function CartScreen() {
   const updateCartHandler = async (item, quantity) => {
     const { data } = await axios.get(`/api/products/${item._id}`);
     if (data.countInStock < quantity) {
-      window.alert('Sorry, Product is out of stock');
+      window.alert('Sorry, Product is Unavaible');
       return;
     }
     ctxDispatch({
@@ -48,7 +48,8 @@ export default function CartScreen() {
         <Col md={8}>
           {cartItems.length === 0 ? (
             <MessageBox>
-              Card id empty.<Link to="/">Go Shopping</Link>
+              Dear valuable customer, Your Cart is empty.
+              <Link to="/">Go Shopping</Link>
             </MessageBox>
           ) : (
             <ListGroup>
@@ -61,21 +62,23 @@ export default function CartScreen() {
                         alt={item.name}
                         className="img-fluid rounded img-thumbnail"
                       ></img>{' '}
-                      <Link to={`/product/${item._id}`}>{item.name}</Link>
+                      <Link className="cardname" to={`/product/${item._id}`}>
+                        {item.name}
+                      </Link>
                     </Col>
                     <Col md={3}>
                       <Button
                         onClick={() =>
                           updateCartHandler(item, item.quantity - 1)
                         }
-                        variant='="light'
+                        variant="light"
                         disabled={item.quantity === 1}
                       >
                         <i className="fas fa-minus-circle"></i>
                       </Button>{' '}
                       <span>{item.quantity}</span>{' '}
                       <Button
-                        variant='="light'
+                        variant="light"
                         onClick={() =>
                           updateCartHandler(item, item.quantity + 1)
                         }
@@ -102,7 +105,7 @@ export default function CartScreen() {
         <Col md={4}>
           <Card>
             <Card.Body>
-              <ListGroup varient="flush">
+              <ListGroup variant="flush">
                 <ListGroup.Item>
                   <h3>
                     Subtotal ({cartItems.reduce((a, c) => a + c.quantity, 0)}{' '}

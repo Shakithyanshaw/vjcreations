@@ -66,8 +66,8 @@ export default function SignupScreen() {
     } else if (!validateName(city)) {
       toast.error('City should only contain alphabets and spaces!');
       return;
-    } else if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+    } else if (password !== confirmPassword || password === '') {
+      toast.error('Passwords do not match or empty');
       return;
     }
     try {
@@ -123,7 +123,7 @@ export default function SignupScreen() {
         <Form.Group className="mb-3" controlId="mobileno">
           <Form.Label>Mobile No</Form.Label>
           <Form.Control
-            type="mobileno"
+            type="tel"
             required
             onChange={(e) => setMobileNo(e.target.value)}
           />
@@ -137,7 +137,7 @@ export default function SignupScreen() {
             <Form.Group className="mb-3" controlId="city">
               <Form.Label>City</Form.Label>
               <Form.Control
-                type="city"
+                type="text"
                 required
                 onChange={(e) => setCity(e.target.value)}
               />

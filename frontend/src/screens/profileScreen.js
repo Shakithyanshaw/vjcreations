@@ -37,6 +37,10 @@ export default function ProfileScreen() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
     try {
       const { data } = await axios.put(
         '/api/users/profile',
@@ -116,7 +120,7 @@ export default function ProfileScreen() {
             <Form.Group className="mb-3" controlId="name">
               <Form.Label>Mobile No</Form.Label>
               <Form.Control
-                type="mobileno"
+                type="tel"
                 value={mobileNo}
                 onChange={(e) => setMobileNo(e.target.value)}
                 required
@@ -128,7 +132,7 @@ export default function ProfileScreen() {
                 <Form.Group className="mb-3" controlId="name">
                   <Form.Label>City</Form.Label>
                   <Form.Control
-                    type="city"
+                    type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     required
