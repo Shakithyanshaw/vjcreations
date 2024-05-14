@@ -23,11 +23,12 @@ const reducer = (state, action) => {
 export default function ProfileScreen() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
-  const [name, setName] = useState(userInfo.name);
-  const [email, setEmail] = useState(userInfo.email);
-  const [mobileNo, setMobileNo] = useState(userInfo.mobileNo);
-  const [city, setCity] = useState(userInfo.city);
-  const [address, setAddress] = useState(userInfo.address);
+  const [name, setName] = useState(userInfo ? userInfo.name : '');
+  const [email, setEmail] = useState(userInfo ? userInfo.email : '');
+  const [mobileNo, setMobileNo] = useState(userInfo ? userInfo.mobileNo : '');
+  const [city, setCity] = useState(userInfo ? userInfo.city : '');
+  const [address, setAddress] = useState(userInfo ? userInfo.address : '');
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 

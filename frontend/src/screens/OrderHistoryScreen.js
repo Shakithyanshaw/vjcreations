@@ -33,6 +33,7 @@ export default function OrderHistoryScreen() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!userInfo) return;
       dispatch({ type: 'FETCH_REQUEST' });
       try {
         const { data } = await axios.get(
@@ -62,6 +63,8 @@ export default function OrderHistoryScreen() {
         <LoadingBox></LoadingBox>
       ) : error ? (
         <MessageBox variant="danger">{error}</MessageBox>
+      ) : orders.length === 0 ? (
+        <MessageBox>No orders found</MessageBox>
       ) : (
         <Table hover className="table">
           <thead>
