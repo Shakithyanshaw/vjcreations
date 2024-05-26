@@ -27,8 +27,15 @@ import { getError } from './utils';
 import SearchBox from './components/SearchBox';
 import SearchScreen from './screens/SearchScreen';
 import ProtectedRoute from './components/ProtectedRoute';
-import DashboardScreen from './screens/DashboardScreen';
+import DashboardScreen from './admin screens/DashboardScreen';
 import AdminRoute from './components/AdminRoute';
+import ProductListScreen from './admin screens/ProductListScreen';
+import ProductEditScreen from './admin screens/ProductEditScreen';
+import OrderListScreen from './admin screens/OrderListScreen';
+import UserListScreen from './admin screens/UserListScreen';
+import UserEditScreen from './admin screens/UserEditScreen';
+import SellerScreen from './admin screens/SellerScreen';
+import logo from '../src/pics/logo.png';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -68,7 +75,7 @@ function App() {
       >
         <ToastContainer position="bottom-center" limit={1} />
         <header>
-          <Navbar bg="dark" variant="dark" expand="lg">
+          <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
             <Container>
               <Button
                 variant="dark"
@@ -77,14 +84,19 @@ function App() {
                 <i className="fas fa-bars"></i>
               </Button>
               <LinkContainer to="/">
-                <Navbar.Brand className="text-white">VJCREATIONS</Navbar.Brand>
+                <Navbar.Brand as={Link} to="/">
+                  <img className="logo" src={logo} alt="Logo" />
+                </Navbar.Brand>
               </LinkContainer>
-              <Navbar.Toggle aria-controls="basic-navbar-nav" />
-              <Navbar.Collapse id="basic-navbar-nav">
-                <SearchBox />
-                <Nav className="me-auto w-100 justify-content-end">
+              <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+              <Navbar.Collapse id="responsive-navbar-nav ">
+                <Nav className="me-auto w-100  justify-content-end">
+                  <Link to="/Aboutus" className="nav-link">
+                    <span className="text-light">About Us</span>
+                  </Link>
+
                   <Link to="/cart" className="nav-link">
-                    Cart
+                    <span className="text-light">Cart</span>
                     {cart.cartItems.length > 0 && (
                       <Badge pill bg="danger">
                         {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
@@ -123,7 +135,6 @@ function App() {
                       <span className="text-light">Signin</span>
                     </Link>
                   )}
-
                   {userInfo && userInfo.isAdmin && (
                     <NavDropdown title="Admin" id="admin-nav-dropdown">
                       <LinkContainer to="/admin/dashboard">
@@ -153,6 +164,7 @@ function App() {
               </Navbar.Collapse>
             </Container>
           </Navbar>
+          <SearchBox />
         </header>
         <div
           className={
@@ -238,6 +250,56 @@ function App() {
                 element={
                   <AdminRoute>
                     <DashboardScreen />
+                  </AdminRoute>
+                }
+              ></Route>
+
+              <Route
+                path="/admin/products"
+                element={
+                  <AdminRoute>
+                    <ProductListScreen />
+                  </AdminRoute>
+                }
+              ></Route>
+
+              <Route
+                path="/admin/product/:id"
+                element={
+                  <AdminRoute>
+                    <ProductEditScreen />
+                  </AdminRoute>
+                }
+              ></Route>
+              <Route
+                path="/admin/orders"
+                element={
+                  <AdminRoute>
+                    <OrderListScreen />
+                  </AdminRoute>
+                }
+              ></Route>
+              <Route
+                path="/admin/users"
+                element={
+                  <AdminRoute>
+                    <UserListScreen />
+                  </AdminRoute>
+                }
+              ></Route>
+              <Route
+                path="/admin/user/:id"
+                element={
+                  <AdminRoute>
+                    <UserEditScreen />
+                  </AdminRoute>
+                }
+              ></Route>
+              <Route
+                path="/admin/sellers"
+                element={
+                  <AdminRoute>
+                    <SellerScreen />
                   </AdminRoute>
                 }
               ></Route>

@@ -1,0 +1,27 @@
+.search {
+  padding-top: 20px;
+  align-items: center;
+  padding-left: 500px;
+  padding-right: 500px;
+}
+
+@media all and (max-width: 1250px) {
+  .search {
+    padding-left: 300px;
+    padding-right: 300px;
+  }
+}
+
+@media all and (max-width: 900px) {
+  .search {
+    padding-left: 200px;
+    padding-right: 200px;
+  }
+}
+
+@media all and (max-width: 600px) {
+  .search {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}

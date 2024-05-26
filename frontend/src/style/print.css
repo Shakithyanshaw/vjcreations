@@ -1,0 +1,50 @@
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  .btnPrint,
+  .deliverBtn,
+  .paypalBtn,
+  .dashboardCard,
+  .btnSale {
+    display: none;
+  }
+
+  table td:last-child,
+  table th:last-child {
+    display: none;
+  }
+
+  h2 {
+    font-size: 18pt;
+    text-align: center;
+    margin: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  card {
+    width: 25%;
+    border-collapse: collapse;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid black;
+  }
+
+  th,
+  td {
+    padding: 5px;
+    text-align: left;
+  }
+
+  tfoot td {
+    text-align: right;
+  }
+}
