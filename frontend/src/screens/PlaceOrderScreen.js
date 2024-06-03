@@ -42,8 +42,22 @@ export default function PlaceOrderScreen() {
   );
 
   cart.shippingPrice = cart.itemsPrice > 100 ? round2(0) : round2(10);
-  cart.taxPrice = round2(0.15 * cart.itemsPrice);
-  cart.totalPrice = cart.itemsPrice + cart.shippingPrice + cart.taxPrice;
+  cart.taxPrice = round2(0.06 * cart.itemsPrice);
+
+  const getDiscountPercentage = (totalPrice) => {
+    if (totalPrice >= 600000) return 10;
+    if (totalPrice >= 300000) return 7;
+    if (totalPrice >= 200000) return 5;
+    if (totalPrice >= 100000) return 4;
+    if (totalPrice >= 50000) return 2.5;
+    if (totalPrice >= 0) return 1;
+    return 0;
+  };
+
+  const discountPercentage = getDiscountPercentage(cart.itemsPrice);
+  const discountAmount = round2((cart.itemsPrice * discountPercentage) / 100);
+  cart.totalPrice =
+    cart.itemsPrice + cart.shippingPrice + cart.taxPrice - discountAmount;
 
   const placeOrderHandler = async () => {
     try {
@@ -58,6 +72,7 @@ export default function PlaceOrderScreen() {
           shippingPrice: cart.shippingPrice,
           taxPrice: cart.taxPrice,
           totalPrice: cart.totalPrice,
+          discountAmount: discountAmount,
         },
         {
           headers: {
@@ -104,8 +119,8 @@ export default function PlaceOrderScreen() {
                     {cart.shippingAddress.postalCode},
                     {cart.shippingAddress.country}
                     <br />
-                    <strong>Event Details : </strong>{' '}
-                    {cart.shippingAddress.date}, {cart.shippingAddress.time}
+                    <strong>Date & Time : </strong> {cart.shippingAddress.date},{' '}
+                    {cart.shippingAddress.time}
                   </Card.Text>
                   <Link className="btn btn-info" to="/shipping">
                     Edit
@@ -149,6 +164,12 @@ export default function PlaceOrderScreen() {
                   <Row>
                     <Col>Tax</Col>
                     <Col>Rs {cart.taxPrice.toFixed(2)}</Col>
+                  </Row>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <Row>
+                    <Col>Discount</Col>
+                    <Col>- Rs {discountAmount.toFixed(2)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>

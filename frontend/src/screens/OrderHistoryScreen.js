@@ -70,7 +70,8 @@ export default function OrderHistoryScreen() {
           <thead>
             <tr>
               <th>Ordered Packages</th>
-              <th>Date ( Order placed )</th>
+              <th>Date</th>
+              <th>Address</th>
               <th>Total</th>
               <th>Paid on</th>
               <th>Deliverd on</th>
@@ -90,6 +91,7 @@ export default function OrderHistoryScreen() {
                   </ul>
                 </td>
                 <td>{order.createdAt.substring(0, 10)}</td>
+                <td>{order.shippingAddress.address}</td>
                 <td>{order.totalPrice.toFixed(2)}</td>
                 <td className={order.isPaid ? '' : 'not-paid'}>
                   {order.isPaid ? (

@@ -1,53 +1,61 @@
 import React, { useContext } from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Rating from './Rating';
-import axios from 'axios';
-import { Store } from '../Store';
+//import axios from 'axios';
+//import { Store } from '../Store';
 
 function Product(props) {
   const { product } = props;
+  const navigate = useNavigate();
 
-  const { state, dispatch: ctxDispatch } = useContext(Store);
-  const {
-    cart: { cartItems },
-  } = state;
-
-  const addToCartHandler = async (item) => {
-    const existItem = cartItems.find((x) => x.id === product._id);
-    const quantity = existItem ? existItem.quantity + 1 : 1;
-    const { data } = await axios.get(`/api/products/${item._id}`);
-    if (data.countInStock < quantity) {
-      window.alert('Sorry, Product is out of stock');
-      return;
+  const sendDetailsToHomeScreen = () => {
+    if (product.type === 'product') {
+      navigate('/', { state: { product } });
+    } else if (product.type === 'service') {
+      navigate('/services', { state: { product } });
     }
-    ctxDispatch({
-      type: 'CART_ADD_ITEM',
-      payload: { ...item, quantity },
-    });
+  };
+
+  const handleViewMore = () => {
+    if (product.type === 'product') {
+      navigate(`/product/${product.slug}`, { state: { product } });
+    } else if (product.type === 'service') {
+      navigate(`/product/${product.slug}`, { state: { product } });
+    }
   };
 
   return (
     <Card>
-      <Link to={`/product/${product.slug}`}>
-        <img src={product.image} className="card-img-top" alt={product.name} />
+      <Link to={`/product/${product.slug}`} onClick={sendDetailsToHomeScreen}>
+        <img
+          src={product.image}
+          className="card-img-top"
+          alt={product.name}
+          style={{
+            maxWidth: '287px',
+            maxHeight: '177px',
+            objectFit: 'cover',
+          }}
+        />
       </Link>
       <Card.Body>
-        <Link to={`/product/${product.slug}`}>
+        <Link to={`/product/${product.slug}`} onClick={sendDetailsToHomeScreen}>
           <Card.Title>{product.name}</Card.Title>
         </Link>
         <Rating rating={product.rating} numReviews={product.numReviews} />
         <Card.Text>Rs{product.price}</Card.Text>
         {product.countInStock === 0 ? (
-          <Button varient="light" disabled>
-            Un-Avaiable
+          <Button variant="light" disabled>
+            Un-Available
           </Button>
         ) : (
-          <Button onClick={() => addToCartHandler(product)}>Book Now</Button>
+          <Button onClick={handleViewMore}>View More</Button>
         )}
       </Card.Body>
     </Card>
   );
 }
+
 export default Product;

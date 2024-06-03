@@ -21,7 +21,7 @@ export default function CartScreen() {
   const updateCartHandler = async (item, quantity) => {
     const { data } = await axios.get(`/api/products/${item._id}`);
     if (data.countInStock < quantity) {
-      window.alert('Sorry, Product is Unavaible');
+      window.alert('Sorry, Product is Unavailable');
       return;
     }
     ctxDispatch({
@@ -41,15 +41,15 @@ export default function CartScreen() {
   return (
     <div className="marginAll">
       <Helmet>
-        <title>Shopping Cart</title>
+        <title>Cart</title>
       </Helmet>
-      <h2>Shopping Cart</h2>
+      <h2>My Cart</h2>
       <Row>
         <Col md={8}>
           {cartItems.length === 0 ? (
             <MessageBox>
               Dear valuable customer, Your Cart is empty.
-              <Link to="/">Go Shopping</Link>
+              <Link to="/">Go to Shopping</Link>
             </MessageBox>
           ) : (
             <ListGroup>
@@ -67,25 +67,29 @@ export default function CartScreen() {
                       </Link>
                     </Col>
                     <Col md={3}>
-                      <Button
-                        onClick={() =>
-                          updateCartHandler(item, item.quantity - 1)
-                        }
-                        variant="light"
-                        disabled={item.quantity === 1}
-                      >
-                        <i className="fas fa-minus-circle"></i>
-                      </Button>{' '}
-                      <span>{item.quantity}</span>{' '}
-                      <Button
-                        variant="light"
-                        onClick={() =>
-                          updateCartHandler(item, item.quantity + 1)
-                        }
-                        disabled={item.quantity === item.countInStock}
-                      >
-                        <i className="fas fa-plus-circle"></i>
-                      </Button>
+                      {item.type === 'product' && (
+                        <>
+                          <Button
+                            onClick={() =>
+                              updateCartHandler(item, item.quantity - 1)
+                            }
+                            variant="light"
+                            disabled={item.quantity === 1}
+                          >
+                            <i className="fas fa-minus-circle"></i>
+                          </Button>{' '}
+                          <span>{item.quantity}</span>{' '}
+                          <Button
+                            variant="light"
+                            onClick={() =>
+                              updateCartHandler(item, item.quantity + 1)
+                            }
+                            disabled={item.quantity === item.countInStock}
+                          >
+                            <i className="fas fa-plus-circle"></i>
+                          </Button>
+                        </>
+                      )}
                     </Col>
                     <Col md={3}>Rs{item.price}</Col>
                     <Col md={2}>

@@ -36,6 +36,7 @@ import UserListScreen from './admin screens/UserListScreen';
 import UserEditScreen from './admin screens/UserEditScreen';
 import SellerScreen from './admin screens/SellerScreen';
 import logo from '../src/pics/logo.png';
+import HomeScreen2 from './screens/HomeScreen2';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -91,8 +92,8 @@ function App() {
               <Navbar.Toggle aria-controls="responsive-navbar-nav" />
               <Navbar.Collapse id="responsive-navbar-nav ">
                 <Nav className="me-auto w-100  justify-content-end">
-                  <Link to="/Aboutus" className="nav-link">
-                    <span className="text-light">About Us</span>
+                  <Link to="/services" className="nav-link">
+                    <span className="text-light">Gift Shop</span>
                   </Link>
 
                   <Link to="/cart" className="nav-link">
@@ -146,9 +147,6 @@ function App() {
                       <LinkContainer to="/admin/orders">
                         <NavDropdown.Item>Orders</NavDropdown.Item>
                       </LinkContainer>
-                      <LinkContainer to="/admin/customorders">
-                        <NavDropdown.Item>Custom Orders</NavDropdown.Item>
-                      </LinkContainer>
                       <LinkContainer to="/admin/users">
                         <NavDropdown.Item>Users</NavDropdown.Item>
                       </LinkContainer>
@@ -175,7 +173,7 @@ function App() {
         >
           <Nav className="flex-column text-white w-100 p-2 navsearch2">
             <Nav.Item>
-              <strong>Categories</strong>
+              <strong>Our Services</strong>
             </Nav.Item>
             {categories.map((category) => (
               <Nav.Item key={category}>
@@ -183,7 +181,7 @@ function App() {
                   to={{ pathname: '/search', search: `?category=${category}` }}
                   onClick={() => setSidebarIsOpen(false)}
                 >
-                  <Nav.Link>{category}</Nav.Link>
+                  <Nav.Link className="navsearch2">{category}</Nav.Link>
                 </LinkContainer>
               </Nav.Item>
             ))}
@@ -198,6 +196,7 @@ function App() {
               <Route path="/search" element={<SearchScreen />} />
               <Route path="/signin" element={<SigninScreen />} />
               <Route path="/signup" element={<SignupScreen />} />
+              <Route path="/services" element={<HomeScreen2 />} />
               <Route
                 path="/placeorder"
                 element={
@@ -271,6 +270,7 @@ function App() {
                   </AdminRoute>
                 }
               ></Route>
+
               <Route
                 path="/admin/orders"
                 element={
@@ -306,8 +306,25 @@ function App() {
             </Routes>
           </Container>
         </main>
-        <footer>
-          <div className="text-center">All rights reserved</div>
+        <footer className="bg-dark text-light">
+          <section className="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
+            <div className="me-5 d-none d-lg-block">
+              <span>Get connected with us on social networks:</span>
+            </div>
+
+            <div>
+              <a href="/" className="me-4 text-reset">
+                <i className="fab fa-facebook-f"></i>
+              </a>
+              <a href="/" className="me-4 text-reset">
+                <i className="fab fa-twitter"></i>
+              </a>
+              <a href="/" className="me-4 text-reset">
+                <i className="fab fa-instagram"></i>
+              </a>
+            </div>
+          </section>
+          <div className="text-center p-4">© 2022 Copyright: Shaki</div>
         </footer>
       </div>
     </BrowserRouter>

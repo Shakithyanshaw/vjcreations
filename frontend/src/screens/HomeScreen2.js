@@ -22,7 +22,7 @@ const reducer = (state, action) => {
   }
 };
 
-function HomeScreen() {
+function HomeScreen2() {
   const [{ loading, error, products }, dispatch] = useReducer(logger(reducer), {
     products: [],
     loading: true,
@@ -46,7 +46,7 @@ function HomeScreen() {
 
   // Filter products to show only those with type 'product'
   const filteredProducts = products.filter(
-    (product) => product.type === 'service'
+    (product) => product.type === 'product'
   );
 
   return (
@@ -54,7 +54,7 @@ function HomeScreen() {
       <Helmet>
         <title>VJ-Creations</title>
       </Helmet>
-      <h1>Our Services</h1>
+      <h1>Gift shop</h1>
       <div className="products">
         {loading ? (
           <LoadingBox />
@@ -73,4 +73,4 @@ function HomeScreen() {
     </div>
   );
 }
-export default HomeScreen;
+export default HomeScreen2;

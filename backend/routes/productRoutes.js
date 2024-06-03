@@ -22,6 +22,7 @@ productRouter.post(
       price: 0,
       category: 'Category',
       brand: 'Brand',
+      type: req.body.type,
       countInStock: 0,
       rating: 0,
       numReviews: 0,
@@ -47,6 +48,7 @@ productRouter.put(
       product.images = req.body.images;
       product.category = req.body.category;
       product.brand = req.body.brand;
+      product.type = req.body.type;
       product.countInStock = req.body.countInStock;
       product.description = req.body.description;
       await product.save();
@@ -80,7 +82,11 @@ productRouter.post(
     const productId = req.params.id;
     const product = await Product.findById(productId);
     if (product) {
-      if (product.reviews.find((x) => x.name === req.user.name)) {
+      // Check if product.reviews is defined before calling find
+      if (
+        product.reviews &&
+        product.reviews.find((x) => x.name === req.user.name)
+      ) {
         return res
           .status(400)
           .send({ message: 'You already submitted a review' });
@@ -91,6 +97,10 @@ productRouter.post(
         rating: Number(req.body.rating),
         comment: req.body.comment,
       };
+      // Handle the case where product.reviews is undefined
+      if (!product.reviews) {
+        product.reviews = [];
+      }
       product.reviews.push(review);
       product.numReviews = product.reviews.length;
       product.rating =

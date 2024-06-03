@@ -177,6 +177,7 @@ export default function ProductListScreen() {
                 <th style={{ textAlign: 'center' }}>Name</th>
                 <th style={{ textAlign: 'center' }}>Price</th>
                 <th style={{ textAlign: 'center' }}>Category</th>
+                <th style={{ textAlign: 'center' }}>Type</th>
                 <th style={{ textAlign: 'center' }}>Brand</th>
                 <th style={{ textAlign: 'center' }}>Rating</th>
                 <th style={{ textAlign: 'center' }}>Count in Stock</th>
@@ -190,6 +191,7 @@ export default function ProductListScreen() {
                   <td>{product.name}</td>
                   <td>{product.price}</td>
                   <td>{product.category}</td>
+                  <td>{product.type}</td>
                   <td>{product.brand}</td>
 
                   <td style={{ textAlign: 'center' }}>

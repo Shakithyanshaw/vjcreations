@@ -1,21 +1,24 @@
-import { Helmet } from 'react-helmet-async';
-import { Form, Row } from 'react-bootstrap';
+import Axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import Axios from 'axios';
+import { Helmet } from 'react-helmet-async';
 import { useContext, useEffect, useState } from 'react';
 import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import { getError } from '../utils';
+import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import back from '../pics/back.jpg';
 
 export default function SignupScreen() {
   const navigate = useNavigate();
+  const [validated, setValidated] = useState(false);
+
   const { search } = useLocation();
   const redirectInUrl = new URLSearchParams(search).get('redirect');
-  const redirect = redirectInUrl ? redirectInUrl : `/`;
-  const [validated, setValidated] = useState(false);
+  const redirect = redirectInUrl ? redirectInUrl : '/';
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -47,6 +50,7 @@ export default function SignupScreen() {
     e.preventDefault();
     const form = e.currentTarget;
     if (form.checkValidity() === false) {
+      e.preventDefault();
       e.stopPropagation();
     }
 
@@ -66,8 +70,8 @@ export default function SignupScreen() {
     } else if (!validateName(city)) {
       toast.error('City should only contain alphabets and spaces!');
       return;
-    } else if (password !== confirmPassword || password === '') {
-      toast.error('Passwords do not match or empty');
+    } else if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
       return;
     }
     try {
@@ -81,10 +85,11 @@ export default function SignupScreen() {
       });
       ctxDispatch({ type: 'USER_SIGNIN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
-      navigate(redirect || `/`);
+      navigate(redirect || '/');
+      toast.success('User created Successfully !');
     } catch (err) {
       toast.error(getError(err));
-      //alert('Invalid email or password');
+      //toast.error("Please enter valid details !");
     }
   };
 
@@ -95,104 +100,132 @@ export default function SignupScreen() {
   }, [navigate, redirect, userInfo]);
 
   return (
-    <Container className="small-container">
-      <Helmet>
-        <title>Sign Up</title>
-      </Helmet>
-      <h1 className="my-3">Sign Up</h1>
-      <Form onSubmit={submitHandler}>
-        <Form.Group className="mb-3" controlId="name">
-          <Form.Label>Name</Form.Label>
-          <Form.Control onChange={(e) => setName(e.target.value)} required />
-          <Form.Control.Feedback type="invalid" className="invalidmessage">
-            Please provide a valid Name.
-          </Form.Control.Feedback>
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="email">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            required
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Form.Control.Feedback type="invalid" className="invalidmessage">
-            Please provide a valid Email.
-          </Form.Control.Feedback>
-        </Form.Group>
+    <div
+      style={{
+        background: `url(${back})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        height: '100vh',
+      }}
+    >
+      <Container className="small-container">
+        <Helmet>
+          <title>Sign Up</title>
+        </Helmet>
+        <h1 className="my-3">Sign Up</h1>
+        <Form noValidate validated={validated} onSubmit={submitHandler}>
+          <Form.Group className="mb-3" controlId="name">
+            <Form.Label>Name</Form.Label>
+            <Form.Control onChange={(e) => setName(e.target.value)} required />
+            <Form.Control.Feedback type="invalid" className="invalidmessage">
+              Please provide a valid Name.
+            </Form.Control.Feedback>
+          </Form.Group>
 
-        <Form.Group className="mb-3" controlId="mobileno">
-          <Form.Label>Mobile No</Form.Label>
-          <Form.Control
-            type="tel"
-            required
-            onChange={(e) => setMobileNo(e.target.value)}
-          />
-          <Form.Control.Feedback type="invalid" className="invalidmessage">
-            Please provide a valid Mobile No.
-          </Form.Control.Feedback>
-        </Form.Group>
+          <Form.Group className="mb-3" controlId="email">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              required
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Form.Control.Feedback type="invalid" className="invalidmessage">
+              Please provide a valid Email.
+            </Form.Control.Feedback>
+          </Form.Group>
 
-        <Row>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="city">
-              <Form.Label>City</Form.Label>
-              <Form.Control
-                type="text"
-                required
-                onChange={(e) => setCity(e.target.value)}
-              />
-              <Form.Control.Feedback type="invalid" className="invalidmessage">
-                Please provide a valid city.
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="address">
-              <Form.Label>Address</Form.Label>
-              <Form.Control
-                type="address"
-                required
-                onChange={(e) => setAddress(e.target.value)}
-              />
-              <Form.Control.Feedback type="invalid" className="invalidmessage">
-                Please provide a valid Address.
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="password">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                required
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <Form.Control.Feedback type="invalid" className="invalidmessage">
-                Please provide a valid password.
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="confirmPassword">
-              <Form.Label>Confirm Password</Form.Label>
-              <Form.Control
-                type="password"
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </Form.Group>
-          </Col>
-        </Row>
-        <div className="mb-3">
-          <Button type="submit">Sign Up</Button>
-        </div>
-        <div className="mb-3">
-          Already have an account?{' '}
-          <Link to={`/signin?redirect=${redirect}`}>Sign In</Link>
-        </div>
-      </Form>
-    </Container>
+          <Form.Group className="mb-3" controlId="mobileno">
+            <Form.Label>Mobile No</Form.Label>
+            <Form.Control
+              type="mobileno"
+              required
+              onChange={(e) => setMobileNo(e.target.value)}
+            />
+            <Form.Control.Feedback type="invalid" className="invalidmessage">
+              Please provide a valid Mobile No.
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3" controlId="city">
+                <Form.Label>City</Form.Label>
+                <Form.Control
+                  type="city"
+                  required
+                  onChange={(e) => setCity(e.target.value)}
+                />
+                <Form.Control.Feedback
+                  type="invalid"
+                  className="invalidmessage"
+                >
+                  Please provide a valid city.
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group className="mb-3" controlId="address">
+                <Form.Label>Address</Form.Label>
+                <Form.Control
+                  type="address"
+                  required
+                  onChange={(e) => setAddress(e.target.value)}
+                />
+                <Form.Control.Feedback
+                  type="invalid"
+                  className="invalidmessage"
+                >
+                  Please provide a valid Address.
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3" controlId="password">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  required
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Form.Control.Feedback
+                  type="invalid"
+                  className="invalidmessage"
+                >
+                  Please provide a valid password.
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group className="mb-3" controlId="confirmPassword">
+                <Form.Label>Confirm Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col className="mb-3">
+              <Button type="submit" className="w-100">
+                Sign Up
+              </Button>
+            </Col>
+            <Col className="mb-3 d-flex justify-content-end align-items-center">
+              <div>
+                Already have an account?{' '}
+                <Link className="btnsignin" to={`/signin?redirect=${redirect}`}>
+                  Sign-In
+                </Link>
+              </div>
+            </Col>
+          </Row>
+        </Form>
+      </Container>
+    </div>
   );
 }

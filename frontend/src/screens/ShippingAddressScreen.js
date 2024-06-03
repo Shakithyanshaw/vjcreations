@@ -7,6 +7,8 @@ import { Store } from '../Store';
 import CheckoutSteps from '../components/CheckoutSteps';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function ShippingAddressScreen() {
   const navigate = useNavigate();
@@ -34,6 +36,25 @@ export default function ShippingAddressScreen() {
 
   const submitHandler = (e) => {
     e.preventDefault();
+
+    const currentDate = new Date();
+
+    // Check if the selected date is in the past
+    if (date < currentDate) {
+      alert('You cannot choose a past date.');
+      return;
+    }
+
+    // Check if the selected time is in the past
+    const selectedDateTime = new Date(date);
+    const [hours, minutes] = time.split(':').map(Number);
+    selectedDateTime.setHours(hours);
+    selectedDateTime.setMinutes(minutes);
+
+    if (selectedDateTime < currentDate) {
+      alert('You cannot choose a past time.');
+      return;
+    }
     ctxDispatch({
       type: 'SAVE_SHIPPING_ADDRESS',
       payload: {
@@ -68,7 +89,7 @@ export default function ShippingAddressScreen() {
       </Helmet>
       <CheckoutSteps step1 step2></CheckoutSteps>
       <div className="container small-container">
-        <h2 className="my-3">Shipping Address / Event Address</h2>
+        <h2 className="my-3">Address</h2>
         <Form onSubmit={submitHandler}>
           <Form.Group className="mb-3" controlId="fullName">
             <Form.Label>Full Name</Form.Label>
@@ -113,19 +134,20 @@ export default function ShippingAddressScreen() {
           </Row>
 
           <Row>
-            <Col md={6}>
+            <Col md={3}>
               <Form.Group className="mb-3" controlId="date">
-                <Form.Label>Event Date</Form.Label>
-                <Form.Control
-                  value={date}
-                  pattern="^\d{4}-\d{2}-\d{2}$"
-                  title="Please enter a date in the format YYYY-MM-DD"
-                  onChange={(e) => setDate(e.target.value)}
+                <Form.Label>Date</Form.Label>
+                <DatePicker
+                  selected={date}
+                  onChange={(date) => setDate(date)}
+                  minDate={new Date()}
+                  dateFormat="yyyy-MM-dd"
+                  className="form-control"
                   required
                 />
               </Form.Group>
             </Col>
-            <Col md={6}>
+            <Col md={9}>
               <Form.Group className="mb-3" controlId="time">
                 <Form.Label>Expected Time</Form.Label>
                 <Form.Control

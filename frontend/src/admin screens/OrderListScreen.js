@@ -131,7 +131,7 @@ export default function OrderListScreen() {
               <th style={{ textAlign: 'center' }}>Order placed on</th>
               <th style={{ textAlign: 'center' }}>Total</th>
               <th style={{ textAlign: 'center' }}>Payment Method</th>
-              <th style={{ textAlign: 'center' }}>Paid on</th>
+              <th style={{ textAlign: 'center' }}>Payment Details</th>
               <th style={{ textAlign: 'center' }}>Delivered on</th>
               <th style={{ textAlign: 'center' }}>Actions</th>
             </tr>
@@ -205,6 +205,7 @@ export default function OrderListScreen() {
                     >
                       Details
                     </Button>
+                    <br></br>
                     &nbsp;
                     <Button
                       type="button"

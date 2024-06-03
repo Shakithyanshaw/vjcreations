@@ -274,7 +274,7 @@ export default function DashboardScreen() {
                       <Card.Title style={{ fontSize: '1.5rem' }}>
                         Rs.
                         {summary?.paymentMethodSales?.find(
-                          (x) => x._id === 'Cash on Delivery'
+                          (x) => x._id === 'COD'
                         )?.totalSales || 0}
                       </Card.Title>
                     </div>

@@ -199,7 +199,7 @@ orderRouter.get(
     ]);
     const CODorders = await Order.aggregate([
       {
-        $match: { paymentMethod: 'Cash On Delivery' },
+        $match: { paymentMethod: 'COD' },
       },
       {
         $group: {
