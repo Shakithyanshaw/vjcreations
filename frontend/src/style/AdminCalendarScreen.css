@@ -1,0 +1,42 @@
+/* AdminCalendarScreen.css */
+.calendar-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendar-wrapper {
+  width: 100%;
+  max-width: 600px;
+}
+
+.calendar {
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Adjust font size for item name and time */
+.calendar-wrapper .item-name {
+  font-size: 12px;
+}
+
+.calendar-wrapper .item-time {
+  font-size: 10px;
+}
+
+.calendar .react-calendar__tile {
+  position: relative;
+}
+
+.event-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #0cbedd;
+  position: absolute;
+  bottom: 2px; /* Adjust as needed */
+  left: 50%; /* Position in the center */
+  transform: translateX(-50%);
+}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
@@ -29,19 +29,25 @@ export default function OrderHistoryScreen() {
   const [{ loading, error, orders }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
+    orders: [],
   });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
 
   useEffect(() => {
     const fetchData = async () => {
       if (!userInfo) return;
       dispatch({ type: 'FETCH_REQUEST' });
       try {
-        const { data } = await axios.get(
-          `/api/orders/mine`,
-
-          { headers: { Authorization: `Bearer ${userInfo.token}` } }
+        const { data } = await axios.get(`/api/orders/mine`, {
+          headers: { Authorization: `Bearer ${userInfo.token}` },
+        });
+        // Sort orders based on createdAt date in descending order
+        const sortedOrders = data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        dispatch({ type: 'FETCH_SUCCESS', payload: sortedOrders });
       } catch (error) {
         dispatch({
           type: 'FETCH_FAIL',
@@ -51,6 +57,12 @@ export default function OrderHistoryScreen() {
     };
     fetchData();
   }, [userInfo]);
+
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div>
@@ -66,70 +78,100 @@ export default function OrderHistoryScreen() {
       ) : orders.length === 0 ? (
         <MessageBox>No orders found</MessageBox>
       ) : (
-        <Table hover className="table">
-          <thead>
-            <tr>
-              <th>Ordered Packages</th>
-              <th>Date</th>
-              <th>Address</th>
-              <th>Total</th>
-              <th>Paid on</th>
-              <th>Deliverd on</th>
-              <th>Event Date</th>
-              <th>Event Time</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id}>
-                <td>
-                  <ul>
-                    {order.orderItems.map((item) => (
-                      <li key={item._id}>{item.name}</li>
-                    ))}
-                  </ul>
-                </td>
-                <td>{order.createdAt.substring(0, 10)}</td>
-                <td>{order.shippingAddress.address}</td>
-                <td>{order.totalPrice.toFixed(2)}</td>
-                <td className={order.isPaid ? '' : 'not-paid'}>
-                  {order.isPaid ? (
-                    order.paidAt.substring(0, 10)
-                  ) : (
-                    <Badge pill bg="danger">
-                      Not paid
-                    </Badge>
-                  )}
-                </td>
-                <td className={order.isDelivered ? '' : 'not-deliverd'}>
-                  {order.isDelivered ? (
-                    order.deliveredAt.substring(0, 10)
-                  ) : (
-                    <Badge pill bg="info">
-                      Not deliverd
-                    </Badge>
-                  )}
-                </td>
-                <td>{order.shippingAddress.date}</td>
-                <td>{order.shippingAddress.time}</td>
-
-                <td>
-                  <Button
-                    type="button"
-                    variant="outline-success"
-                    onClick={() => {
-                      navigate(`/order/${order._id}`);
-                    }}
-                  >
-                    Details
-                  </Button>
-                </td>
+        <>
+          <Table hover className="table">
+            <thead>
+              <tr>
+                <th>Ordered Packages</th>
+                <th>Date</th>
+                <th>Event Location</th>
+                <th>Total</th>
+                <th>Paid on</th>
+                <th>Delivered on</th>
+                <th>Event Date</th>
+                <th>Event Time</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {currentOrders.map((order) => (
+                <tr key={order._id}>
+                  <td>
+                    <ul>
+                      {order.orderItems.map((item) => (
+                        <li key={item._id}>{item.name}</li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td>{order.createdAt.substring(0, 10)}</td>
+                  <td>{order.shippingAddress.address}</td>
+                  <td>{order.totalPrice.toFixed(2)}</td>
+                  <td className={order.isPaid ? '' : 'not-paid'}>
+                    {order.isPaid ? (
+                      order.paidAt.substring(0, 10)
+                    ) : (
+                      <Badge pill bg="danger">
+                        Not paid
+                      </Badge>
+                    )}
+                  </td>
+                  <td className={order.isDelivered ? '' : 'not-deliverd'}>
+                    {order.isDelivered ? (
+                      order.deliveredAt.substring(0, 10)
+                    ) : (
+                      <Badge pill bg="info">
+                        Not delivered
+                      </Badge>
+                    )}
+                  </td>
+                  <td>
+                    {new Date(order.shippingAddress.date).toLocaleDateString()}
+                  </td>
+                  <td>{order.shippingAddress.time}</td>
+                  <td>
+                    <Button
+                      type="button"
+                      variant="outline-success"
+                      onClick={() => {
+                        navigate(`/order/${order._id}`);
+                      }}
+                    >
+                      Details
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Pagination
+            itemsPerPage={ordersPerPage}
+            totalItems={orders.length}
+            paginate={paginate}
+          />
+        </>
       )}
     </div>
   );
 }
+
+const Pagination = ({ itemsPerPage, totalItems, paginate }) => {
+  const pageNumbers = [];
+
+  for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <nav>
+      <ul className="pagination">
+        {pageNumbers.map((number) => (
+          <li key={number} className="page-item">
+            <button onClick={() => paginate(number)} className="page-link">
+              {number}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+};

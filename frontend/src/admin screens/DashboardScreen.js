@@ -30,6 +30,14 @@ const reducer = (state, action) => {
   }
 };
 
+// Function to format price using Sri Lankan Rupees
+const formatPrice = (price) => {
+  return new Intl.NumberFormat('en-LK', {
+    style: 'currency',
+    currency: 'LKR',
+  }).format(price);
+};
+
 export default function DashboardScreen() {
   const navigate = useNavigate();
   const [{ loading, summary, error }, dispatch] = useReducer(reducer, {
@@ -197,9 +205,8 @@ export default function DashboardScreen() {
                       <Card.Text style={{ fontSize: '1.25rem' }}>
                         Total Sales
                       </Card.Text>
-                      <Card.Title style={{ fontSize: '2rem' }}>
-                        Rs.
-                        {summary?.orders?.[0]?.totalSales?.toFixed(2) || 0}
+                      <Card.Title style={{ fontSize: '1.5rem' }}>
+                        {formatPrice(summary?.orders?.[0]?.totalSales || 0)}
                       </Card.Title>
                     </div>
                   </div>
@@ -272,10 +279,11 @@ export default function DashboardScreen() {
                         Sales (Cash on Delivery)
                       </Card.Text>
                       <Card.Title style={{ fontSize: '1.5rem' }}>
-                        Rs.
-                        {summary?.paymentMethodSales?.find(
-                          (x) => x._id === 'COD'
-                        )?.totalSales || 0}
+                        {formatPrice(
+                          summary.CODorders && summary.users[0]
+                            ? summary.CODorders[0].totalSales
+                            : 0
+                        )}
                       </Card.Title>
                     </div>
                   </div>
@@ -290,10 +298,11 @@ export default function DashboardScreen() {
                         Sales ( Paypal )
                       </Card.Text>
                       <Card.Title style={{ fontSize: '1.5rem' }}>
-                        Rs .
-                        {summary.Paypalorders && summary.users[0]
-                          ? summary.Paypalorders[0].totalSales.toFixed(2)
-                          : 0}
+                        {formatPrice(
+                          summary.Paypalorders && summary.users[0]
+                            ? summary.Paypalorders[0].totalSales
+                            : 0
+                        )}
                       </Card.Title>
                     </div>
                   </div>

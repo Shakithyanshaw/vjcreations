@@ -37,7 +37,8 @@ import UserEditScreen from './admin screens/UserEditScreen';
 import SellerScreen from './admin screens/SellerScreen';
 import logo from '../src/pics/logo.png';
 import HomeScreen2 from './screens/HomeScreen2';
-
+//import BookServiceScreen from './screens/BookServiceScreen';
+import AdminCalendarScreen from './admin screens/AdminCalenderScreen';
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
@@ -153,6 +154,9 @@ function App() {
                       <LinkContainer to="/admin/sellers">
                         <NavDropdown.Item>Sellers</NavDropdown.Item>
                       </LinkContainer>
+                      <LinkContainer to="/admin/calendar">
+                        <NavDropdown.Item>Calendar</NavDropdown.Item>
+                      </LinkContainer>
                       <LinkContainer to="/admin/support">
                         <NavDropdown.Item>Support</NavDropdown.Item>
                       </LinkContainer>
@@ -197,6 +201,7 @@ function App() {
               <Route path="/signin" element={<SigninScreen />} />
               <Route path="/signup" element={<SignupScreen />} />
               <Route path="/services" element={<HomeScreen2 />} />
+              {/* <Route path="/book-service/:id" element={<BookServiceScreen />} /> */}
               <Route
                 path="/placeorder"
                 element={
@@ -213,7 +218,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-
               <Route
                 path="/orderhistory"
                 element={<OrderHistoryScreen />}
@@ -242,8 +246,15 @@ function App() {
                   </ProtectedRoute>
                 }
               ></Route>
-
               {/* Admin Routes */}
+              <Route
+                path="/admin/calendar"
+                element={
+                  <AdminRoute>
+                    <AdminCalendarScreen />
+                  </AdminRoute>
+                }
+              ></Route>{' '}
               <Route
                 path="/admin/dashboard"
                 element={
@@ -252,7 +263,6 @@ function App() {
                   </AdminRoute>
                 }
               ></Route>
-
               <Route
                 path="/admin/products"
                 element={
@@ -261,7 +271,6 @@ function App() {
                   </AdminRoute>
                 }
               ></Route>
-
               <Route
                 path="/admin/product/:id"
                 element={
@@ -270,7 +279,6 @@ function App() {
                   </AdminRoute>
                 }
               ></Route>
-
               <Route
                 path="/admin/orders"
                 element={

@@ -296,11 +296,15 @@ export default function ProductEditScreen() {
             <Col md={4}>
               <Form.Group className="mb-3" controlId="type">
                 <Form.Label>Type</Form.Label>
-                <Form.Control
+                <Form.Select
                   value={type}
                   onChange={(e) => setType(e.target.value)}
                   required
-                />
+                >
+                  <option value="">Select Type</option>
+                  <option value="service">service</option>
+                  <option value="product">product</option>
+                </Form.Select>
               </Form.Group>
             </Col>
             <Col md={4}>

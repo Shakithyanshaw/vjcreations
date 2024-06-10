@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import { Link, useNavigate } from 'react-router-dom';
 import Rating from './Rating';
-//import axios from 'axios';
-//import { Store } from '../Store';
+// import axios from 'axios';
+// import { Store } from '../Store';
 
 function Product(props) {
   const { product } = props;
@@ -26,6 +26,13 @@ function Product(props) {
     }
   };
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-LK', {
+      style: 'currency',
+      currency: 'LKR',
+    }).format(price);
+  };
+
   return (
     <Card>
       <Link to={`/product/${product.slug}`} onClick={sendDetailsToHomeScreen}>
@@ -45,7 +52,7 @@ function Product(props) {
           <Card.Title>{product.name}</Card.Title>
         </Link>
         <Rating rating={product.rating} numReviews={product.numReviews} />
-        <Card.Text>Rs{product.price}</Card.Text>
+        <Card.Text>{formatPrice(product.price)}</Card.Text>
         {product.countInStock === 0 ? (
           <Button variant="light" disabled>
             Un-Available

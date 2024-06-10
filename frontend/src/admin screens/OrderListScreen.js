@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
@@ -42,6 +42,7 @@ const reducer = (state, action) => {
       return state;
   }
 };
+
 export default function OrderListScreen() {
   const navigate = useNavigate();
   const { state } = useContext(Store);
@@ -52,6 +53,9 @@ export default function OrderListScreen() {
       error: '',
     });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -60,6 +64,8 @@ export default function OrderListScreen() {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        // Reset current page to 1 when new orders are loaded
+        setCurrentPage(1);
       } catch (err) {
         dispatch({
           type: 'FETCH_FAIL',
@@ -92,6 +98,27 @@ export default function OrderListScreen() {
     }
   };
 
+  const formatDate = (dateString) => {
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
+    return new Date(dateString).toLocaleString(undefined, options);
+  };
+
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders
+    ? orders
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort in descending order
+        .slice(indexOfFirstOrder, indexOfLastOrder)
+    : [];
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   const handlePrint = () => {
     window.print();
   };
@@ -123,103 +150,138 @@ export default function OrderListScreen() {
       ) : error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
-        <Table hover className="table">
-          <thead>
-            <tr>
-              <th style={{ textAlign: 'center' }}>Customer</th>
-              <th style={{ textAlign: 'center' }}>Ordered Packages</th>
-              <th style={{ textAlign: 'center' }}>Order placed on</th>
-              <th style={{ textAlign: 'center' }}>Total</th>
-              <th style={{ textAlign: 'center' }}>Payment Method</th>
-              <th style={{ textAlign: 'center' }}>Payment Details</th>
-              <th style={{ textAlign: 'center' }}>Delivered on</th>
-              <th style={{ textAlign: 'center' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((order) => (
-                <tr key={order._id}>
-                  <td style={{ textAlign: 'center' }}>
-                    {order.user ? order.user.name : 'DELETED USER'}
-                  </td>
-                  <td>
-                    <ul>
-                      {order.orderItems.map((item) => (
-                        <li key={item._id}>{item.name}</li>
-                      ))}
-                    </ul>
-                  </td>
-                  <td style={{ textAlign: 'center' }}>
-                    {order.createdAt.substring(0, 10)}
-                  </td>
-                  <td>{order.totalPrice.toFixed(2)}</td>
+        <>
+          <Table hover className="table">
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'center' }}>Customer</th>
+                <th style={{ textAlign: 'center' }}>Ordered Packages</th>
+                <th style={{ textAlign: 'center' }}>Order placed on</th>
+                <th style={{ textAlign: 'center' }}>Event date</th>
+                <th style={{ textAlign: 'center' }}>Total</th>
+                <th style={{ textAlign: 'center' }}>Payment Method</th>
+                <th style={{ textAlign: 'center' }}>Payment Details</th>
+                <th style={{ textAlign: 'center' }}>Delivered on</th>
+                <th style={{ textAlign: 'center' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentOrders
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .map((order) => (
+                  <tr key={order._id}>
+                    <td style={{ textAlign: 'center' }}>
+                      {order.user ? order.user.name : 'DELETED USER'}
+                    </td>
+                    <td>
+                      <ul>
+                        {order.orderItems.map((item) => (
+                          <li key={item._id}>{item.name}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td style={{ textAlign: 'center' }}>
+                      {formatDate(order.createdAt)}
+                    </td>
+                    <td style={{ textAlign: 'center' }}>
+                      {order.shippingAddress &&
+                        order.shippingAddress.date &&
+                        formatDate(order.shippingAddress.date)}
+                    </td>
+                    <td>{order.totalPrice.toFixed(2)}</td>
 
-                  <td style={{ textAlign: 'center' }}>
-                    {order.paymentMethod === 'PayPal' ? (
-                      <Badge pill bg="primary">
-                        {order.paymentMethod}
-                      </Badge>
-                    ) : order.paymentMethod === 'Cash On Delivery' ? (
-                      <Badge pill bg="secondary">
-                        {order.paymentMethod}
-                      </Badge>
-                    ) : (
-                      order.paymentMethod
-                    )}
-                  </td>
-                  <td
-                    style={{ textAlign: 'center' }}
-                    className={order.isPaid ? '' : 'not-paid'}
-                  >
-                    {order.isPaid ? (
-                      order.paidAt.substring(0, 10)
-                    ) : (
-                      <Badge pill bg="danger">
-                        Not paid
-                      </Badge>
-                    )}
-                  </td>
-
-                  <td
-                    style={{ textAlign: 'center' }}
-                    className={order.isDelivered ? '' : 'not-deliverd'}
-                  >
-                    {order.isDelivered ? (
-                      order.deliveredAt.substring(0, 10)
-                    ) : (
-                      <Badge pill bg="info">
-                        Not deliverd
-                      </Badge>
-                    )}
-                  </td>
-
-                  <td style={{ textAlign: 'center' }}>
-                    <Button
-                      type="button"
-                      variant="outline-success"
-                      onClick={() => {
-                        navigate(`/order/${order._id}`);
-                      }}
+                    <td style={{ textAlign: 'center' }}>
+                      {order.paymentMethod === 'PayPal' ? (
+                        <Badge pill bg="primary">
+                          {order.paymentMethod}
+                        </Badge>
+                      ) : order.paymentMethod === 'Cash On Delivery' ? (
+                        <Badge pill bg="secondary">
+                          {order.paymentMethod}
+                        </Badge>
+                      ) : (
+                        order.paymentMethod
+                      )}
+                    </td>
+                    <td
+                      style={{ textAlign: 'center' }}
+                      className={order.isPaid ? '' : 'not-paid'}
                     >
-                      Details
-                    </Button>
-                    <br></br>
-                    &nbsp;
-                    <Button
-                      type="button"
-                      variant="outline-danger"
-                      onClick={() => deleteHandler(order)}
+                      {order.isPaid ? (
+                        formatDate(order.paidAt)
+                      ) : (
+                        <Badge pill bg="danger">
+                          Not paid
+                        </Badge>
+                      )}
+                    </td>
+
+                    <td
+                      style={{ textAlign: 'center' }}
+                      className={order.isDelivered ? '' : 'not-deliverd'}
                     >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </Table>
+                      {order.isDelivered ? (
+                        formatDate(order.deliveredAt)
+                      ) : (
+                        <Badge pill bg="info">
+                          Not delivered
+                        </Badge>
+                      )}
+                    </td>
+
+                    <td style={{ textAlign: 'center' }}>
+                      <Button
+                        type="button"
+                        variant="outline-success"
+                        onClick={() => {
+                          navigate(`/order/${order._id}`);
+                        }}
+                      >
+                        Details
+                      </Button>
+                      <br></br>
+                      &nbsp;
+                      <Button
+                        type="button"
+                        variant="outline-danger"
+                        onClick={() => deleteHandler(order)}
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </Table>
+          <Pagination
+            itemsPerPage={ordersPerPage}
+            totalItems={orders.length}
+            paginate={paginate}
+          />
+        </>
       )}
     </div>
   );
 }
+
+const Pagination = ({ itemsPerPage, totalItems, paginate }) => {
+  const pageNumbers = [];
+
+  for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
+  return (
+    <nav>
+      <ul className="pagination">
+        {pageNumbers.map((number) => (
+          <li key={number} className="page-item">
+            <button onClick={() => paginate(number)} className="page-link">
+              {number}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+};

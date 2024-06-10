@@ -16,6 +16,8 @@ import { Store } from '../Store';
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import { toast } from 'react-toastify';
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -73,6 +75,7 @@ function ProductScreen() {
 
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
+
   const addToCartHandler = async () => {
     const existItem = cart && cart.cartItems.find((x) => x.id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
@@ -87,6 +90,7 @@ function ProductScreen() {
     });
     navigate('/cart');
   };
+
   const submitHandler = async (e) => {
     e.preventDefault();
     if (!comment || !rating) {
@@ -131,19 +135,32 @@ function ProductScreen() {
     }
   };
 
-  const bookServiceHandler = async () => {
-    const existItem = cart && cart.cartItems.find((x) => x.id === product._id);
-    const quantity = existItem ? existItem.quantity + 1 : 1;
-    const { data } = await axios.get(`/api/products/${product._id}`);
-    if (data.countInStock < quantity) {
-      window.alert('Sorry, Service is fully booked');
-      return;
+  const bookServiceHandler = () => {
+    // Check if the product exists and is of type 'service'
+    if (product && product.type === 'service') {
+      // Check if the service is available on the selected date
+      if (selectedDate && !isAvailable(selectedDate)) {
+        // If the service is not available, show an error message
+        toast.error('This service is not available on the selected date.');
+        return;
+      }
+
+      // If the service is available, proceed to add it to the cart
+      const existItem =
+        cart && cart.cartItems.find((x) => x.id === product._id);
+      const quantity = existItem ? existItem.quantity + 1 : 1;
+      ctxDispatch({
+        type: 'CART_ADD_ITEM',
+        payload: { ...product, quantity },
+      });
+      // Navigate to the cart page
+      navigate('/cart');
+    } else {
+      // If the product is not a service, display a message or handle the situation accordingly
+      console.error('Error: Product is not a service');
+      // Optionally, you can show a message to the user
+      toast.error('This item cannot be booked as it is not a service.');
     }
-    ctxDispatch({
-      type: 'CART_ADD_ITEM',
-      payload: { ...product, quantity },
-    });
-    navigate('/cart');
   };
 
   const renderActionButton = () => {
@@ -162,10 +179,49 @@ function ProductScreen() {
     }
   };
 
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    // Perform any availability check logic here
+  };
+
+  // Define a function to check availability based on the selected date
+  const isAvailable = (selectedDate) => {
+    // Get the current date
+    const currentDate = new Date();
+
+    // Calculate the next seven dates
+    const nextSevenDates = [...Array(7)].map((_, index) => {
+      const date = new Date();
+      date.setDate(currentDate.getDate() + index);
+      return date;
+    });
+
+    // Check if the selectedDate is within the next seven dates
+    return nextSevenDates.some((date) => isSameDay(date, selectedDate));
+  };
+
+  // Define a function to compare two dates (ignoring time)
+  const isSameDay = (date1, date2) => {
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-LK', {
+      style: 'currency',
+      currency: 'LKR',
+    }).format(price);
+  };
+
   return loading ? (
     <LoadingBox />
   ) : error ? (
-    <MessageBox varient="danger">{error}</MessageBox>
+    <MessageBox variant="danger">{error}</MessageBox>
   ) : (
     <div className="marginAll">
       <Row>
@@ -177,7 +233,7 @@ function ProductScreen() {
           ></img>
         </Col>
         <Col md={3}>
-          <ListGroup varient="flush">
+          <ListGroup variant="flush">
             <ListGroup.Item>
               <Helmet>
                 <title>{product.name}</title>
@@ -191,7 +247,12 @@ function ProductScreen() {
               ></Rating>
             </ListGroup.Item>
 
-            <ListGroup.Item>Price : Rs{product.price}</ListGroup.Item>
+            <ListGroup.Item>
+              Price : {formatPrice(product.price)}
+              {product.type === 'product' && (
+                <span> (In Stock: {product.countInStock})</span>
+              )}
+            </ListGroup.Item>
 
             <ListGroup.Item>
               <Row xs={1} md={2} className="g-2">
@@ -224,20 +285,47 @@ function ProductScreen() {
                 <ListGroup.Item>
                   <Row>
                     <Col>Price:</Col>
-                    <Col>Rs{product.price}</Col>
+                    <Col>{formatPrice(product.price)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  <Row>
-                    <Col>Status:</Col>
-                    <Col>
-                      {product.countInStock > 0 ? (
-                        <Badge bg="success">Available</Badge>
-                      ) : (
-                        <Badge bg="danger">Unavailable</Badge>
-                      )}
-                    </Col>
-                  </Row>
+                  <Col>
+                    {/* Add additional status for service */}
+                    {product.type === 'service' && (
+                      <div>
+                        <h5>Check Availability</h5>
+                        <ReactDatePicker
+                          style={{ width: '100px', fontSize: '14px' }}
+                          selected={selectedDate} // State to store selected date
+                          onChange={handleDateChange} // Handler for date change
+                          minDate={new Date()} // Minimum selectable date
+                          // Add additional props as needed
+                        />
+                        {/* Display availability based on selectedDate */}
+                        {selectedDate && (
+                          <div>
+                            {isAvailable(selectedDate) ? (
+                              <Badge bg="success">Available</Badge>
+                            ) : (
+                              <Badge bg="danger">Unavailable</Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </Col>
+                  <Col>
+                    {/* Add additional status for service */}
+                    {product.type === 'product' && (
+                      <div>
+                        {product.countInStock > 0 ? (
+                          <Badge bg="success">Available</Badge>
+                        ) : (
+                          <Badge bg="danger">Unavailable</Badge>
+                        )}
+                      </div>
+                    )}
+                  </Col>
                 </ListGroup.Item>
 
                 {product.countInStock > 0 && (
@@ -289,7 +377,7 @@ function ProductScreen() {
                       <option value="2">2- Fair</option>
                       <option value="3">3- Good</option>
                       <option value="4">4- Very good</option>
-                      <option value="5">5- Excelent</option>
+                      <option value="5">5- Excellent</option>
                     </Form.Select>
                   </Form.Group>
                   <FloatingLabel

@@ -100,10 +100,20 @@ export default function ProductListScreen() {
   const createHandler = async () => {
     if (window.confirm('Are you sure to create a Product?')) {
       try {
+        // Validate the type field
+        const allowedTypes = ['product', 'service'];
+        const type = prompt('Enter product type (product/service):');
+        if (!type || !allowedTypes.includes(type)) {
+          throw new Error('Invalid or missing product type');
+        }
+
         dispatch({ type: 'CREATE_REQUEST' });
         const { data } = await axios.post(
           '/api/products',
-          {},
+          {
+            // Include the type field in the request body
+            type: type,
+          },
           {
             headers: { Authorization: `Bearer ${userInfo.token}` },
           }
@@ -115,6 +125,7 @@ export default function ProductListScreen() {
         toast.error(getError(error));
         dispatch({
           type: 'CREATE_FAIL',
+          payload: getError(err),
         });
       }
     }

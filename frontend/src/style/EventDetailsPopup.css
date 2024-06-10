@@ -1,0 +1,29 @@
+.order-details {
+  margin-bottom: 20px;
+}
+
+.modal-content {
+  border-radius: 10px;
+}
+
+.modal-header {
+  background-color: #f0f0f0;
+  border-bottom: none;
+}
+
+.modal-footer {
+  border-top: none;
+}
+
+.modal-footer button {
+  border-radius: 5px;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+ul {
+  padding-left: 20px;
+}

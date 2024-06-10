@@ -12,6 +12,11 @@ import CheckoutSteps from '../components/CheckoutSteps';
 import LoadingBox from '../components/LoadingBox';
 import { getError } from '../utils';
 import { toast } from 'react-toastify';
+import {
+  PayPalButtons,
+  PayPalScriptProvider,
+  usePayPalScriptReducer,
+} from '@paypal/react-paypal-js';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -28,11 +33,7 @@ const reducer = (state, action) => {
 
 export default function PlaceOrderScreen() {
   const navigate = useNavigate();
-
-  const [{ loading }, dispatch] = useReducer(reducer, {
-    loading: false,
-  });
-
+  const [{ loading }, dispatch] = useReducer(reducer, { loading: false });
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
 
@@ -40,7 +41,6 @@ export default function PlaceOrderScreen() {
   cart.itemsPrice = round2(
     cart.cartItems.reduce((a, c) => a + c.quantity * c.price, 0)
   );
-
   cart.shippingPrice = cart.itemsPrice > 100 ? round2(0) : round2(10);
   cart.taxPrice = round2(0.06 * cart.itemsPrice);
 
@@ -58,6 +58,8 @@ export default function PlaceOrderScreen() {
   const discountAmount = round2((cart.itemsPrice * discountPercentage) / 100);
   cart.totalPrice =
     cart.itemsPrice + cart.shippingPrice + cart.taxPrice - discountAmount;
+
+  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
   const placeOrderHandler = async () => {
     try {
@@ -94,7 +96,78 @@ export default function PlaceOrderScreen() {
     if (!cart.paymentMethod) {
       navigate('/payment');
     }
-  }, [cart, navigate]);
+
+    if (cart.paymentMethod === 'PayPal' && cart.totalPrice > 0) {
+      const loadPayPalScript = async () => {
+        const { data: clientId } = await axios.get('/api/keys/paypal', {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        });
+        paypalDispatch({
+          type: 'resetOptions',
+          value: {
+            'client-id': clientId,
+            currency: 'USD',
+          },
+        });
+        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
+      };
+      loadPayPalScript();
+    }
+  }, [cart, navigate, paypalDispatch, userInfo.token]);
+
+  const onApprove = async (data, actions) => {
+    return actions.order.capture().then(async function (details) {
+      try {
+        dispatch({ type: 'CREATE_REQUEST' });
+        const { data: orderData } = await axios.post(
+          '/api/orders',
+          {
+            orderItems: cart.cartItems,
+            shippingAddress: cart.shippingAddress,
+            paymentMethod: cart.paymentMethod,
+            itemsPrice: cart.itemsPrice,
+            shippingPrice: cart.shippingPrice,
+            taxPrice: cart.taxPrice,
+            totalPrice: cart.totalPrice,
+            discountAmount: discountAmount,
+          },
+          {
+            headers: {
+              authorization: `Bearer ${userInfo.token}`,
+            },
+          }
+        );
+        ctxDispatch({ type: 'CART_CLEAR' });
+        dispatch({ type: 'CREATE_SUCCESS' });
+        localStorage.removeItem('cartItems');
+        navigate(`/order/${orderData.order._id}`);
+      } catch (err) {
+        dispatch({ type: 'CREATE_FAIL' });
+        toast.error(getError(err));
+      }
+    });
+  };
+
+  const onError = (err) => {
+    toast.error(getError(err));
+  };
+
+  const formatDateTime = (dateString, timeString) => {
+    const date = new Date(dateString);
+    const [hours, minutes] = timeString.split(':');
+    date.setHours(hours, minutes);
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    })}`;
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-LK', {
+      style: 'currency',
+      currency: 'LKR',
+    }).format(price);
+  };
 
   return (
     <div className="marginAll">
@@ -119,8 +192,11 @@ export default function PlaceOrderScreen() {
                     {cart.shippingAddress.postalCode},
                     {cart.shippingAddress.country}
                     <br />
-                    <strong>Date & Time : </strong> {cart.shippingAddress.date},{' '}
-                    {cart.shippingAddress.time}
+                    <strong>Date & Time : </strong>{' '}
+                    {formatDateTime(
+                      cart.shippingAddress.date,
+                      cart.shippingAddress.time
+                    )}
                   </Card.Text>
                   <Link className="btn btn-info" to="/shipping">
                     Edit
@@ -151,49 +227,75 @@ export default function PlaceOrderScreen() {
                 <ListGroup.Item>
                   <Row>
                     <Col>Items</Col>
-                    <Col>Rs {cart.itemsPrice.toFixed(2)}</Col>
+                    <Col>{formatPrice(cart.itemsPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Shipping</Col>
-                    <Col>Rs {cart.shippingPrice.toFixed(2)}</Col>
+                    <Col>{formatPrice(cart.shippingPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Tax</Col>
-                    <Col>Rs {cart.taxPrice.toFixed(2)}</Col>
+                    <Col>{formatPrice(cart.taxPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Discount</Col>
-                    <Col>- Rs {discountAmount.toFixed(2)}</Col>
+                    <Col>- {formatPrice(discountAmount)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>
-                      <strong> Order Total</strong>
+                      <strong>Order Total</strong>
                     </Col>
                     <Col>
-                      <strong>Rs {cart.totalPrice.toFixed(2)}</strong>
+                      <strong>{formatPrice(cart.totalPrice)}</strong>
                     </Col>
                   </Row>
                 </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className="d-grid">
-                    <Button
-                      type="button"
-                      onClick={placeOrderHandler}
-                      disabled={cart.cartItems.length === 0}
+                {cart.paymentMethod === 'PayPal' && !isPending && (
+                  <ListGroup.Item>
+                    <PayPalScriptProvider
+                      options={{
+                        'client-id': 'YOUR_CLIENT_ID',
+                        currency: 'USD',
+                      }}
                     >
-                      Place Order
-                    </Button>
-                  </div>
-                  {loading && <LoadingBox></LoadingBox>}
-                </ListGroup.Item>
+                      <PayPalButtons
+                        createOrder={(data, actions) => {
+                          return actions.order.create({
+                            purchase_units: [
+                              {
+                                amount: { value: cart.totalPrice },
+                              },
+                            ],
+                          });
+                        }}
+                        onApprove={onApprove}
+                        onError={onError}
+                      ></PayPalButtons>
+                    </PayPalScriptProvider>
+                  </ListGroup.Item>
+                )}
+                {cart.paymentMethod === 'COD' && (
+                  <ListGroup.Item>
+                    <div className="d-grid">
+                      <Button
+                        type="button"
+                        onClick={placeOrderHandler}
+                        disabled={cart.cartItems.length === 0}
+                      >
+                        Place Order
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                )}
+                {loading && <LoadingBox></LoadingBox>}
               </ListGroup>
             </Card.Body>
           </Card>
@@ -224,7 +326,7 @@ export default function PlaceOrderScreen() {
                     <Col md={2}>
                       <span>{item.quantity}</span>
                     </Col>
-                    <Col md={3}>Rs {item.price}</Col>
+                    <Col md={3}>{formatPrice(item.price)}</Col>
                   </Row>
                 </ListGroup.Item>
               ))}

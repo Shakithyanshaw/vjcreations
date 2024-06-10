@@ -2,7 +2,6 @@ import axios from 'axios';
 import React, { useContext, useEffect, useReducer } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router';
-//import Order from "../../../backend/models/OrderModel";
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import { Store } from '../Store';
@@ -19,7 +18,6 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-//import jsPDF from "jspdf";
 
 function reducer(state, action) {
   switch (action.type) {
@@ -44,11 +42,7 @@ function reducer(state, action) {
     case 'DELIVER_FAIL':
       return { ...state, loadingDeliver: false };
     case 'DELIVER_RESET':
-      return {
-        ...state,
-        loadingDeliver: false,
-        successDeliver: false,
-      };
+      return { ...state, loadingDeliver: false, successDeliver: false };
     default:
       return state;
   }
@@ -82,6 +76,25 @@ export default function OrderScreen() {
   });
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
+
+  function formatDate(isoString) {
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    };
+    return new Date(isoString).toLocaleDateString(undefined, options);
+  }
+
+  function formatPrice(price) {
+    return new Intl.NumberFormat('en-LK', {
+      style: 'currency',
+      currency: 'LKR',
+    }).format(price);
+  }
 
   function createOrder(data, actions) {
     return actions.order
@@ -129,6 +142,18 @@ export default function OrderScreen() {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
+
+        // Mark as paid automatically if payment method is PayPal
+        if (data.paymentMethod === 'PayPal' && !data.isPaid) {
+          await axios.put(
+            `/api/orders/${orderId}/pay`,
+            {},
+            {
+              headers: { authorization: `Bearer ${userInfo.token}` },
+            }
+          );
+          dispatch({ type: 'PAY_SUCCESS', payload: data });
+        }
       } catch (err) {
         dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
       }
@@ -158,7 +183,7 @@ export default function OrderScreen() {
           type: 'resetOptions',
           value: {
             'client-id': clientId,
-            currency: 'LKR',
+            currency: 'USD', // Changed to USD
           },
         });
         paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
@@ -297,7 +322,7 @@ export default function OrderScreen() {
                   </Card.Text>
                   {order.isPaid ? (
                     <MessageBox variant="success">
-                      Paid at {order.paidAt}
+                      {formatDate(order.paidAt)}
                     </MessageBox>
                   ) : (
                     <MessageBox variant="danger">Not Paid</MessageBox>
@@ -310,10 +335,10 @@ export default function OrderScreen() {
                       type="button"
                       onClick={paymentOrderHandler}
                     >
-                      Cash Paied
+                      Cash Paid
                     </Button>
                   ) : (
-                    <div class="alert" role="alert"></div>
+                    <div className="alert" role="alert"></div>
                   )}
                 </Card.Body>
               </Card>
@@ -343,7 +368,7 @@ export default function OrderScreen() {
                       <Col md={2}>
                         <span>{item.quantity}</span>
                       </Col>
-                      <Col md={3}>Rs{item.price}</Col>
+                      <Col md={3}>{formatPrice(item.price)}</Col>
                     </Row>
                   </ListGroup.Item>
                 ))}
@@ -360,19 +385,19 @@ export default function OrderScreen() {
                 <ListGroup.Item>
                   <Row>
                     <Col>Items</Col>
-                    <Col>Rs{order.itemsPrice.toFixed(2)}</Col>
+                    <Col>{formatPrice(order.itemsPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Shipping</Col>
-                    <Col>Rs{order.shippingPrice.toFixed(2)}</Col>
+                    <Col>{formatPrice(order.shippingPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Tax</Col>
-                    <Col>Rs{order.taxPrice.toFixed(2)}</Col>
+                    <Col>{formatPrice(order.taxPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
@@ -381,27 +406,30 @@ export default function OrderScreen() {
                       <strong> Order Total</strong>
                     </Col>
                     <Col>
-                      <strong>Rs{order.totalPrice.toFixed(2)}</strong>
+                      <strong>{formatPrice(order.totalPrice)}</strong>
                     </Col>
                   </Row>
                 </ListGroup.Item>
 
-                {!order.isPaid && (
+                {!order.isPaid && order.paymentMethod === 'PayPal' && (
                   <ListGroup.Item>
                     {isPending ? (
                       <LoadingBox />
                     ) : (
-                      <div className="paypalBtn">
-                        <PayPalScriptProvider>
-                          <PayPalButtons
-                            createOrder={createOrder}
-                            onApprove={onApprove}
-                            onError={onError}
-                          ></PayPalButtons>
-                        </PayPalScriptProvider>
-                      </div>
+                      <PayPalScriptProvider
+                        options={{
+                          'client-id': 'YOUR_CLIENT_ID',
+                          currency: 'USD',
+                        }}
+                      >
+                        <PayPalButtons
+                          createOrder={createOrder}
+                          onApprove={onApprove}
+                          onError={onError}
+                        />
+                      </PayPalScriptProvider>
                     )}
-                    {loadingPay && <LoadingBox></LoadingBox>}
+                    {loadingPay && <LoadingBox />}
                   </ListGroup.Item>
                 )}
               </ListGroup>

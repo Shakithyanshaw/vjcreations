@@ -1,5 +1,4 @@
-//import data from '../data';
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import axios from 'axios';
 import logger from 'use-reducer-logger';
 import Row from 'react-bootstrap/Row';
@@ -8,6 +7,7 @@ import Product from '../components/Product';
 import { Helmet } from 'react-helmet-async';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
+import Pagination from 'react-bootstrap/Pagination';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -28,7 +28,10 @@ function HomeScreen2() {
     loading: true,
     error: '',
   });
-  //const [Products, setProducts] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 8;
+
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
@@ -38,8 +41,6 @@ function HomeScreen2() {
       } catch (err) {
         dispatch({ type: 'FETCH_FAIL', payload: err.message });
       }
-
-      //setProducts(result.data);
     };
     fetchData();
   }, []);
@@ -48,6 +49,19 @@ function HomeScreen2() {
   const filteredProducts = products.filter(
     (product) => product.type === 'product'
   );
+
+  // Sort filtered products alphabetically by name
+  filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+
+  // Pagination logic
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div>
@@ -61,16 +75,34 @@ function HomeScreen2() {
         ) : error ? (
           <MessageBox variant="danger">{error}</MessageBox>
         ) : (
-          <Row>
-            {filteredProducts.map((product) => (
-              <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
-                <Product product={product}></Product>
-              </Col>
-            ))}
-          </Row>
+          <>
+            <Row>
+              {currentProducts.map((product) => (
+                <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
+                  <Product product={product}></Product>
+                </Col>
+              ))}
+            </Row>
+            <Pagination>
+              {[
+                ...Array(
+                  Math.ceil(filteredProducts.length / productsPerPage)
+                ).keys(),
+              ].map((x) => (
+                <Pagination.Item
+                  key={x + 1}
+                  active={x + 1 === currentPage}
+                  onClick={() => paginate(x + 1)}
+                >
+                  {x + 1}
+                </Pagination.Item>
+              ))}
+            </Pagination>
+          </>
         )}
       </div>
     </div>
   );
 }
+
 export default HomeScreen2;

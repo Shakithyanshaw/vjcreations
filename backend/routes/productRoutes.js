@@ -5,31 +5,46 @@ import Product from '../models/productModel.js';
 
 const productRouter = express.Router();
 
-productRouter.get(`/`, async (req, res) => {
-  const products = await Product.find();
-  res.send(products);
-});
+productRouter.get(
+  `/`,
+  expressAsyncHandler(async (req, res) => {
+    const products = await Product.find();
+    res.send(products);
+  })
+);
 
 productRouter.post(
   '/',
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
-    const newProduct = new Product({
-      name: 'Name ' + Date.now(),
-      slug: 'Name-' + Date.now(),
-      image: '/images/p1.jpg',
-      price: 0,
-      category: 'Category',
-      brand: 'Brand',
-      type: req.body.type,
-      countInStock: 0,
-      rating: 0,
-      numReviews: 0,
-      description: 'Description',
-    });
-    const product = await newProduct.save();
-    res.send({ message: 'Product Created', product });
+    try {
+      // Validate and handle errors for the 'type' field
+      const allowedTypes = ['product', 'service'];
+      if (!req.body.type || !allowedTypes.includes(req.body.type)) {
+        return res
+          .status(400)
+          .send({ message: 'Invalid or missing product type' });
+      }
+      const newProduct = new Product({
+        name: 'Name ' + Date.now(),
+        slug: 'Name-' + Date.now(),
+        image: '/images/p1.jpg',
+        price: 0,
+        category: 'Category',
+        brand: 'Brand',
+        type: req.body.type, // Ensure 'type' is included in the request body
+        countInStock: 0,
+        rating: 0,
+        numReviews: 0,
+        description: 'Description',
+      });
+      const product = await newProduct.save();
+      res.status(201).send({ message: 'Product Created', product });
+    } catch (error) {
+      console.error('Error creating product:', error); // Log the error
+      res.status(500).send({ message: error.message });
+    }
   })
 );
 
@@ -41,6 +56,13 @@ productRouter.put(
     const productId = req.params.id;
     const product = await Product.findById(productId);
     if (product) {
+      // Validate and handle errors for the 'type' field
+      const allowedTypes = ['product', 'service'];
+      if (!req.body.type || !allowedTypes.includes(req.body.type)) {
+        return res
+          .status(400)
+          .send({ message: 'Invalid or missing product type' });
+      }
       product.name = req.body.name;
       product.slug = req.body.slug;
       product.price = req.body.price;

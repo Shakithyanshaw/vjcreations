@@ -19,20 +19,41 @@ export default function ShippingAddressScreen() {
     cart: { shippingAddress },
   } = state;
 
-  const [fullName, setFullName] = useState(shippingAddress.fullName || '');
-  const [address, setAddress] = useState(shippingAddress.address || '');
-  const [city, setCity] = useState(shippingAddress.city || '');
-  const [time, setTime] = useState(shippingAddress.time || '');
-  const [date, setDate] = useState(shippingAddress.date || '');
+  const [isNewAddress, setIsNewAddress] = useState(!shippingAddress);
+
+  const [fullName, setFullName] = useState(
+    isNewAddress ? '' : shippingAddress.fullName || ''
+  );
+  const [address, setAddress] = useState(
+    isNewAddress ? '' : shippingAddress.address || ''
+  );
+  const [city, setCity] = useState(
+    isNewAddress ? '' : shippingAddress.city || ''
+  );
+  const [time, setTime] = useState(
+    isNewAddress ? '' : shippingAddress.time || ''
+  );
+  const [date, setDate] = useState(
+    isNewAddress
+      ? new Date()
+      : shippingAddress.date
+      ? new Date(shippingAddress.date)
+      : new Date()
+  );
+
+  const cities = ['Jaffna'];
+
   const [postalCode, setPostalCode] = useState(
-    shippingAddress.postalCode || ''
+    isNewAddress ? '' : shippingAddress.postalCode || ''
   );
   useEffect(() => {
     if (!userInfo) {
       navigate(`/signin?redirect=/shipping`);
     }
   }, [userInfo, navigate]);
-  const [country, setCountry] = useState(shippingAddress.country || '');
+  const [country, setCountry] = useState(
+    isNewAddress ? '' : shippingAddress.country || ''
+  );
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -82,15 +103,49 @@ export default function ShippingAddressScreen() {
     navigate('/payment');
   };
 
+  const handleNewAddressToggle = () => {
+    setIsNewAddress(!isNewAddress);
+    if (!isNewAddress) {
+      // Clear form fields when switching to new address
+      setFullName('');
+      setAddress('');
+      setCity('');
+      setTime('');
+      setDate(new Date());
+      setPostalCode('');
+      setCountry('');
+    } else {
+      // Set form fields with saved address when switching back to saved address
+      setFullName(shippingAddress.fullName || '');
+      setAddress(shippingAddress.address || '');
+      setCity(shippingAddress.city || '');
+      setTime(shippingAddress.time || '');
+      setDate(
+        shippingAddress.date ? new Date(shippingAddress.date) : new Date()
+      );
+      setPostalCode(shippingAddress.postalCode || '');
+      setCountry(shippingAddress.country || '');
+    }
+  };
+
   return (
     <div className="marginAll">
       <Helmet>
-        <title>Shipping Address</title>
+        <title>Shipping Addres</title>
       </Helmet>
       <CheckoutSteps step1 step2></CheckoutSteps>
       <div className="container small-container">
-        <h2 className="my-3">Address</h2>
+        <h2 className="my-3">Event Location</h2>
         <Form onSubmit={submitHandler}>
+          <Form.Group className="mb-3" controlId="isNewAddress">
+            <Form.Check
+              type="checkbox"
+              label="Use a new address"
+              checked={isNewAddress}
+              onChange={handleNewAddressToggle}
+              style={{ marginRight: '10px' }}
+            />
+          </Form.Group>
           <Form.Group className="mb-3" controlId="fullName">
             <Form.Label>Full Name</Form.Label>
             <Form.Control
@@ -102,21 +157,28 @@ export default function ShippingAddressScreen() {
 
           <Row>
             <Col md={4}>
+              <Form.Group className="mb-3" controlId="city">
+                <Form.Label>City</Form.Label>
+                <Form.Select
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
+                >
+                  <option value="">Select a District</option>
+                  {cities.map((cityName) => (
+                    <option key={cityName} value={cityName}>
+                      {cityName}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={4}>
               <Form.Group className="mb-3" controlId="address">
                 <Form.Label>Address</Form.Label>
                 <Form.Control
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  required
-                />
-              </Form.Group>
-            </Col>
-            <Col md={4}>
-              <Form.Group className="mb-3" controlId="city">
-                <Form.Label>City</Form.Label>
-                <Form.Control
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
                   required
                 />
               </Form.Group>
@@ -133,34 +195,6 @@ export default function ShippingAddressScreen() {
             </Col>
           </Row>
 
-          <Row>
-            <Col md={3}>
-              <Form.Group className="mb-3" controlId="date">
-                <Form.Label>Date</Form.Label>
-                <DatePicker
-                  selected={date}
-                  onChange={(date) => setDate(date)}
-                  minDate={new Date()}
-                  dateFormat="yyyy-MM-dd"
-                  className="form-control"
-                  required
-                />
-              </Form.Group>
-            </Col>
-            <Col md={9}>
-              <Form.Group className="mb-3" controlId="time">
-                <Form.Label>Expected Time</Form.Label>
-                <Form.Control
-                  value={time}
-                  pattern="^(0?[1-9]|1[0-2]):[0-5][0-9] (am|pm)$"
-                  title="Please enter a time in the format hh:mm am/pm"
-                  onChange={(e) => setTime(e.target.value)}
-                  required
-                />
-              </Form.Group>
-            </Col>
-          </Row>
-
           <Form.Group className="mb-3" controlId="country">
             <Form.Label>Country</Form.Label>
             <Form.Control
@@ -169,6 +203,33 @@ export default function ShippingAddressScreen() {
               required
             />
           </Form.Group>
+
+          <Row>
+            <Col md={3}>
+              <Form.Group className="mb-3" controlId="date">
+                <Form.Label>Date</Form.Label>
+                <DatePicker
+                  selected={new Date(date)}
+                  onChange={(date) => setDate(date.toISOString())}
+                  minDate={new Date()}
+                  dateFormat="yyyy-MM-dd"
+                  className="form-control"
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col md={3}>
+              <Form.Group className="mb-3" controlId="time">
+                <Form.Label>Time</Form.Label>
+                <Form.Control
+                  type="time"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  required
+                />
+              </Form.Group>
+            </Col>
+          </Row>
 
           <div className="mb-3">
             <Button variant="dark" type="submit">
