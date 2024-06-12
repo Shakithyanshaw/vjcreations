@@ -10,7 +10,17 @@ import { toast } from 'react-toastify';
 import { getError } from '../utils';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import back from '../pics/back.jpg';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faUser,
+  faEnvelope,
+  faPhone,
+  faCity,
+  faMapMarkerAlt,
+  faUnlockAlt,
+} from '@fortawesome/free-solid-svg-icons';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../style/SignupScreen.css';
 
 export default function SignupScreen() {
   const navigate = useNavigate();
@@ -100,132 +110,154 @@ export default function SignupScreen() {
   }, [navigate, redirect, userInfo]);
 
   return (
-    <div
-      style={{
-        background: `url(${back})`,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        height: '100vh',
-      }}
-    >
-      <Container className="small-container">
-        <Helmet>
-          <title>Sign Up</title>
-        </Helmet>
-        <h1 className="my-3">Sign Up</h1>
-        <Form noValidate validated={validated} onSubmit={submitHandler}>
-          <Form.Group className="mb-3" controlId="name">
-            <Form.Label>Name</Form.Label>
-            <Form.Control onChange={(e) => setName(e.target.value)} required />
-            <Form.Control.Feedback type="invalid" className="invalidmessage">
-              Please provide a valid Name.
-            </Form.Control.Feedback>
-          </Form.Group>
+    <div className="signup-background">
+      <div className="signup-overlay">
+        <Container className="small-container">
+          <Helmet>
+            <title>Sign Up</title>
+          </Helmet>
+          <h1 className="my-3 text-center">Sign Up</h1>
+          <Form noValidate validated={validated} onSubmit={submitHandler}>
+            <Form.Group className="mb-3" controlId="name">
+              <Form.Label>
+                <FontAwesomeIcon icon={faUser} className="mr-2" />
+                Name
+              </Form.Label>
+              <Form.Control
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+              <Form.Control.Feedback type="invalid" className="invalidmessage">
+                Please provide a valid Name.
+              </Form.Control.Feedback>
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="email">
-            <Form.Label>Email</Form.Label>
-            <Form.Control
-              type="email"
-              required
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <Form.Control.Feedback type="invalid" className="invalidmessage">
-              Please provide a valid Email.
-            </Form.Control.Feedback>
-          </Form.Group>
+            <Form.Group className="mb-3" controlId="email">
+              <Form.Label>
+                <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
+                Email
+              </Form.Label>
+              <Form.Control
+                type="email"
+                required
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Form.Control.Feedback type="invalid" className="invalidmessage">
+                Please provide a valid Email.
+              </Form.Control.Feedback>
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="mobileno">
-            <Form.Label>Mobile No</Form.Label>
-            <Form.Control
-              type="mobileno"
-              required
-              onChange={(e) => setMobileNo(e.target.value)}
-            />
-            <Form.Control.Feedback type="invalid" className="invalidmessage">
-              Please provide a valid Mobile No.
-            </Form.Control.Feedback>
-          </Form.Group>
+            <Form.Group className="mb-3" controlId="mobileno">
+              <Form.Label>
+                <FontAwesomeIcon icon={faPhone} className="mr-2" />
+                Mobile No
+              </Form.Label>
+              <Form.Control
+                type="mobileno"
+                required
+                onChange={(e) => setMobileNo(e.target.value)}
+              />
+              <Form.Control.Feedback type="invalid" className="invalidmessage">
+                Please provide a valid Mobile No.
+              </Form.Control.Feedback>
+            </Form.Group>
 
-          <Row>
-            <Col md={6}>
-              <Form.Group className="mb-3" controlId="city">
-                <Form.Label>City</Form.Label>
-                <Form.Control
-                  type="city"
-                  required
-                  onChange={(e) => setCity(e.target.value)}
-                />
-                <Form.Control.Feedback
-                  type="invalid"
-                  className="invalidmessage"
-                >
-                  Please provide a valid city.
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group className="mb-3" controlId="address">
-                <Form.Label>Address</Form.Label>
-                <Form.Control
-                  type="address"
-                  required
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-                <Form.Control.Feedback
-                  type="invalid"
-                  className="invalidmessage"
-                >
-                  Please provide a valid Address.
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row>
-            <Col md={6}>
-              <Form.Group className="mb-3" controlId="password">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  required
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <Form.Control.Feedback
-                  type="invalid"
-                  className="invalidmessage"
-                >
-                  Please provide a valid password.
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group className="mb-3" controlId="confirmPassword">
-                <Form.Label>Confirm Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3" controlId="city">
+                  <Form.Label>
+                    <FontAwesomeIcon icon={faCity} className="mr-2" />
+                    City
+                  </Form.Label>
+                  <Form.Control
+                    type="city"
+                    required
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+                  <Form.Control.Feedback
+                    type="invalid"
+                    className="invalidmessage"
+                  >
+                    Please provide a valid city.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3" controlId="address">
+                  <Form.Label>
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
+                    Address
+                  </Form.Label>
+                  <Form.Control
+                    type="address"
+                    required
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                  <Form.Control.Feedback
+                    type="invalid"
+                    className="invalidmessage"
+                  >
+                    Please provide a valid Address.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3" controlId="password">
+                  <Form.Label>
+                    <FontAwesomeIcon icon={faUnlockAlt} className="mr-2" />
+                    Password
+                  </Form.Label>
+                  <Form.Control
+                    type="password"
+                    required
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <Form.Control.Feedback
+                    type="invalid"
+                    className="invalidmessage"
+                  >
+                    Please provide a valid password.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3" controlId="confirmPassword">
+                  <Form.Label>Confirm Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
 
-          <Row>
-            <Col className="mb-3">
-              <Button type="submit" className="w-100">
-                Sign Up
-              </Button>
-            </Col>
-            <Col className="mb-3 d-flex justify-content-end align-items-center">
-              <div>
-                Already have an account?{' '}
-                <Link className="btnsignin" to={`/signin?redirect=${redirect}`}>
-                  Sign-In
-                </Link>
-              </div>
-            </Col>
-          </Row>
-        </Form>
-      </Container>
+            <Row>
+              <Col md={4} className="mb-3">
+                <Button type="submit" className="signup-button w-100">
+                  Sign Up
+                </Button>
+              </Col>
+              <Col
+                md={8}
+                className="mb-3 d-flex justify-content-end align-items-center"
+              >
+                <div>
+                  Already have an account?{' '}
+                  <Link
+                    className="btnsignin"
+                    to={`/signin?redirect=${redirect}`}
+                  >
+                    Sign-In
+                  </Link>
+                </div>
+              </Col>
+            </Row>
+          </Form>
+        </Container>
+      </div>
     </div>
   );
 }

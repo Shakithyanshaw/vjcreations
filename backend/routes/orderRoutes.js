@@ -325,6 +325,24 @@ orderRouter.get(
       { $limit: 10 },
     ]);
 
+    const monthlyCODOrders = await Order.aggregate([
+      {
+        $match: {
+          paymentMethod: 'COD',
+          createdAt: {
+            $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
+          orders: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
     res.send({
       users,
       orders,
@@ -342,6 +360,7 @@ orderRouter.get(
       usersByCity,
       yearlyOrderCount,
       topSellingProducts,
+      monthlyCODOrders,
     });
   })
 );

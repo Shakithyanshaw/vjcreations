@@ -8,7 +8,10 @@ import { useContext, useEffect, useState } from 'react';
 import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import { getError } from '../utils';
-import back from '../pics/back.jpg';
+//import back from '../pics/back.jpg';
+import { FaEnvelope, FaLock } from 'react-icons/fa';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../style/SigninScreen.css';
 
 export default function SigninScreen() {
   const navigate = useNavigate();
@@ -45,48 +48,48 @@ export default function SigninScreen() {
   }, [navigate, redirect, userInfo]);
 
   return (
-    <div
-      style={{
-        background: `url(${back})`,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        height: '60vh',
-      }}
-    >
-      <Container className="small-container">
-        <Helmet>
-          <title>Sign In</title>
-        </Helmet>
-        <h1 className="my-3">Sign In</h1>
-        <Form onSubmit={submitHandler}>
-          <Form.Group className="mb-3" controlId="email">
-            <Form.Label>Email</Form.Label>
-            <Form.Control
-              type="email"
-              required
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="password">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              required
-              onChange={(e) => setPassword(e.target.value)}
-            />{' '}
-            {/* Fixed typo here */}
-          </Form.Group>
-          <div className="mb-3">
-            <Button type="submit">Sign In</Button>
-          </div>
-          <div className="mb-3">
-            New customer?{' '}
-            <Link className="btnsignin" to={`/signup?redirect=${redirect}`}>
-              Create your account
-            </Link>
-          </div>
-        </Form>
-      </Container>
+    <div className="signin-background">
+      <div className="signin-overlay">
+        <Container className="small-container">
+          <Helmet>
+            <title>Sign In</title>
+          </Helmet>
+          <h1 className="my-3 text-center">Sign In</h1>
+          <Form onSubmit={submitHandler} className="signin-form">
+            <Form.Group className="mb-3" controlId="email">
+              <Form.Label>
+                <FaEnvelope /> Email
+              </Form.Label>
+              <Form.Control
+                type="email"
+                required
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="password">
+              <Form.Label>
+                <FaLock /> Password
+              </Form.Label>
+              <Form.Control
+                type="password"
+                required
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Group>
+            <div className="mb-3">
+              <Button type="submit" className="signin-button">
+                Sign In
+              </Button>
+            </div>
+            <div className="mb-3 text-center">
+              New customer?{' '}
+              <Link className="btnsignin" to={`/signup?redirect=${redirect}`}>
+                Create your account
+              </Link>
+            </div>
+          </Form>
+        </Container>
+      </div>
     </div>
   );
 }
