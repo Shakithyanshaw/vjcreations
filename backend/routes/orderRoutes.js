@@ -4,6 +4,7 @@ import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
 import Product from '../models/productModel.js';
 import { isAuth, isAdmin } from '../utils.js';
+import { sendOrderConfirmationEmail } from '../emailService.js';
 
 const orderRouter = express.Router();
 
@@ -33,6 +34,8 @@ orderRouter.post(
     });
 
     const order = await newOrder.save();
+    // After creating the order, send confirmation email
+    await sendOrderConfirmationEmail(req.user.email, req.user.name, newOrder);
     res.status(201).send({ message: 'New Order Created', order });
   })
 );
@@ -420,6 +423,8 @@ orderRouter.put(
       const updateOrder = await order.save();
       res.send({ message: 'Order Paid', order: updateOrder });
     } else {
+      // After updating the order, send confirmation email
+      await sendOrderConfirmationEmail(req.user.email, req.user.name, order);
       res.send(404).send({ message: 'Order Not Found' });
     }
   })

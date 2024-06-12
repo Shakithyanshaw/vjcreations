@@ -42,18 +42,24 @@ function reducer(state, action) {
       return { ...state, cart: { ...state.cart, cartItems } };
     }
     case 'CART_CLEAR':
+      localStorage.removeItem('cartItems'); // Clear cart items from local storage
       return { ...state, cart: { ...state.cart, cartItems: [] } };
     case 'USER_SIGNIN':
       return { ...state, userInfo: action.payload };
     case 'USER_SIGNOUT':
+      localStorage.removeItem('userInfo');
+      localStorage.removeItem('cartItems'); // Clear cart items from local storage
+      localStorage.removeItem('shippingAddress');
+      localStorage.removeItem('paymentMethod');
       return {
         ...state,
         userInfo: null,
-        cartItems: [],
-        shippingAddress: {},
-        paymentMethod: '',
+        cart: {
+          shippingAddress: {},
+          paymentMethod: '',
+          cartItems: [],
+        },
       };
-
     case 'SAVE_SHIPPING_ADDRESS':
       return {
         ...state,
@@ -67,7 +73,6 @@ function reducer(state, action) {
         ...state,
         cart: { ...state.cart, paymentMethod: action.payload },
       };
-
     default:
       return state;
   }

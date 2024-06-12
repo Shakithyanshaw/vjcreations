@@ -77,6 +77,10 @@ function ProductScreen() {
   const { cart, userInfo } = state;
 
   const addToCartHandler = async () => {
+    if (!userInfo) {
+      navigate('/signin');
+      return;
+    }
     const existItem = cart && cart.cartItems.find((x) => x.id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
     const { data } = await axios.get(`/api/products/${product._id}`);
@@ -136,16 +140,17 @@ function ProductScreen() {
   };
 
   const bookServiceHandler = () => {
-    // Check if the product exists and is of type 'service'
+    if (!userInfo) {
+      navigate('/signin');
+      return;
+    }
+
     if (product && product.type === 'service') {
-      // Check if the service is available on the selected date
       if (selectedDate && !isAvailable(selectedDate)) {
-        // If the service is not available, show an error message
         toast.error('This service is not available on the selected date.');
         return;
       }
 
-      // If the service is available, proceed to add it to the cart
       const existItem =
         cart && cart.cartItems.find((x) => x.id === product._id);
       const quantity = existItem ? existItem.quantity + 1 : 1;
@@ -153,17 +158,22 @@ function ProductScreen() {
         type: 'CART_ADD_ITEM',
         payload: { ...product, quantity },
       });
-      // Navigate to the cart page
       navigate('/cart');
     } else {
-      // If the product is not a service, display a message or handle the situation accordingly
       console.error('Error: Product is not a service');
-      // Optionally, you can show a message to the user
       toast.error('This item cannot be booked as it is not a service.');
     }
   };
 
   const renderActionButton = () => {
+    if (!userInfo) {
+      return (
+        <MessageBox>
+          Please <Link to="/signin">Sign In</Link> to proceed
+        </MessageBox>
+      );
+    }
+
     if (product.type === 'product') {
       return (
         <div className="d-grid">
@@ -183,26 +193,19 @@ function ProductScreen() {
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    // Perform any availability check logic here
   };
 
-  // Define a function to check availability based on the selected date
   const isAvailable = (selectedDate) => {
-    // Get the current date
     const currentDate = new Date();
-
-    // Calculate the next seven dates
     const nextSevenDates = [...Array(7)].map((_, index) => {
       const date = new Date();
       date.setDate(currentDate.getDate() + index);
       return date;
     });
 
-    // Check if the selectedDate is within the next seven dates
     return nextSevenDates.some((date) => isSameDay(date, selectedDate));
   };
 
-  // Define a function to compare two dates (ignoring time)
   const isSameDay = (date1, date2) => {
     return (
       date1.getDate() === date2.getDate() &&
@@ -290,18 +293,15 @@ function ProductScreen() {
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Col>
-                    {/* Add additional status for service */}
                     {product.type === 'service' && (
                       <div>
                         <h5>Check Availability</h5>
                         <ReactDatePicker
                           style={{ width: '100px', fontSize: '14px' }}
-                          selected={selectedDate} // State to store selected date
-                          onChange={handleDateChange} // Handler for date change
-                          minDate={new Date()} // Minimum selectable date
-                          // Add additional props as needed
+                          selected={selectedDate}
+                          onChange={handleDateChange}
+                          minDate={new Date()}
                         />
-                        {/* Display availability based on selectedDate */}
                         {selectedDate && (
                           <div>
                             {isAvailable(selectedDate) ? (
@@ -315,7 +315,6 @@ function ProductScreen() {
                     )}
                   </Col>
                   <Col>
-                    {/* Add additional status for service */}
                     {product.type === 'product' && (
                       <div>
                         {product.countInStock > 0 ? (

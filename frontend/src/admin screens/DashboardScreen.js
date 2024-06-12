@@ -87,45 +87,55 @@ export default function DashboardScreen() {
     navigate(`/admin/products`);
   };
 
-  const [showDiv, setShowDiv] = useState(false);
-  const [showDivOrder, setShowDivOrder] = useState(false);
-  const [showDivOrderMonth, setShowDivOrderMonth] = useState(false);
-  const [showDivOrderYear, setShowDivOrderYear] = useState(false);
-  const [showDivOrderCity, setShowDivOrderCity] = useState(false);
-  const [showDivCustomerCity, setShowDivCustomerCity] = useState(false);
-  const [showMonthSaleDiv, setShowMonthSaleDiv] = useState(false);
+  //const [showDiv, setShowDiv] = useState(false);
+  //const [showDivOrder, setShowDivOrder] = useState(false);
+  // const [showDivOrderMonth, setShowDivOrderMonth] = useState(false);
+  // [showDivOrderYear, setShowDivOrderYear] = useState(false);
+  //const [showDivOrderCity, setShowDivOrderCity] = useState(false);
+  //const [showDivCustomerCity, setShowDivCustomerCity] = useState(false);
+  // [showMonthSaleDiv, setShowMonthSaleDiv] = useState(false);
+
+  const [activeSection, setActiveSection] = useState(null);
 
   const handleMonthSale = () => {
-    setShowMonthSaleDiv(!showMonthSaleDiv);
+    setActiveSection(activeSection === 'monthlySales' ? null : 'monthlySales');
   };
+
   const handleYearSale = () => {
-    setShowDiv(!showDiv);
+    setActiveSection(activeSection === 'yearlySales' ? null : 'yearlySales');
   };
+
   const handleOrderCount = () => {
-    setShowDivOrder(!showDivOrder);
+    setActiveSection(activeSection === 'dailyOrders' ? null : 'dailyOrders');
   };
+
   const handleOrderCountMonth = () => {
-    setShowDivOrderMonth(!showDivOrderMonth);
+    setActiveSection(
+      activeSection === 'monthlyOrders' ? null : 'monthlyOrders'
+    );
   };
+
   const handleOrderCountYear = () => {
-    setShowDivOrderYear(!showDivOrderYear);
+    setActiveSection(activeSection === 'yearlyOrders' ? null : 'yearlyOrders');
   };
 
   const handleOrderCity = () => {
-    setShowDivOrderCity(!showDivOrderCity);
+    setActiveSection(activeSection === 'ordersByCity' ? null : 'ordersByCity');
   };
 
   const handleCustomerCity = () => {
-    setShowDivCustomerCity(!showDivCustomerCity);
+    setActiveSection(
+      activeSection === 'customersByCity' ? null : 'customersByCity'
+    );
   };
 
   return (
     <div className="marginAll">
       <Row>
-        <Col md={10}>
+        <Col md={9}>
           <h2 className="dashboardCard">Welcome {userInfo.name} !</h2>
         </Col>
-        <Col md={2}>
+        <Col md={3}>
           <h6>{currentDateTime}</h6>
         </Col>
       </Row>
@@ -254,19 +264,23 @@ export default function DashboardScreen() {
                 {summary?.dailyOrders?.length === 0 ? (
                   <MessageBox>No Sale</MessageBox>
                 ) : (
-                  <Chart
-                    width="90%"
-                    height="400px"
-                    chartType="Bar"
-                    loader={<div>Loading Chart...</div>}
-                    data={[
-                      ['Date', 'Sales'],
-                      ...summary.dailyOrders.map((x) => [x._id, x.sales]),
-                    ]}
-                    options={{
-                      colors: ['#FFA500'], // Set the color to orange
-                    }}
-                  ></Chart>
+                  <>
+                    <Chart
+                      width="90%"
+                      height="400px"
+                      chartType="Bar"
+                      loader={<div>Loading Chart...</div>}
+                      data={[
+                        ['Date', 'Sales'],
+                        ...summary.dailyOrders
+                          .slice(-7)
+                          .map((x) => [x._id, x.sales]), // Slice the last 5 days of sales
+                      ]}
+                      options={{
+                        colors: ['#FFA500'], // Set the color to orange
+                      }}
+                    />
+                  </>
                 )}
               </div>
             </Col>
@@ -401,237 +415,311 @@ export default function DashboardScreen() {
             </Col>
           </Row>
 
-          <Row>
-            <Col md={7}>
-              {showMonthSaleDiv && (
-                <div>
-                  <Col md={12} className="chartdesign">
-                    <div className="my-3">
-                      <Row>
-                        <Col md={8}>
-                          <h3>Monthly Sales</h3>
-                        </Col>
-                        <Col md={4}></Col>
-                      </Row>
-
-                      {summary.monthlyOrders.length === 0 ? (
-                        <MessageBox>No Sale</MessageBox>
-                      ) : (
-                        <Chart
-                          width="90%"
-                          height="300px"
-                          chartType="AreaChart"
-                          loader={<div>Loading Chart...</div>}
-                          data={[
-                            ['Date', 'Sales'],
-                            ...summary.monthlyOrders.map((x) => [
-                              x._id,
-                              x.sales,
-                            ]),
-                          ]}
-                          options={{
-                            colors: ['#FFA500'], // Set the color to orange
-                          }}
-                        ></Chart>
-                      )}
-                    </div>
+          {activeSection === 'monthlySales' && (
+            <Col md={12} className="chartdesign">
+              <div className="my-3">
+                <Row>
+                  <Col md={8}>
+                    <h3>Monthly Sales</h3>
                   </Col>
-                </div>
-              )}
-            </Col>
-            <Col md={5}>
-              {showDiv && (
-                <div>
-                  <Col md={12} className="chartdesign">
-                    <div className="my-3">
-                      <Row>
-                        <Col md={8}>
-                          <h3>Yearly Sales</h3>
-                        </Col>
-                        <Col md={4}></Col>
-                      </Row>
+                  <Col md={4}></Col>
+                </Row>
 
-                      {summary.yearlyOrders.length === 0 ? (
-                        <MessageBox>No Sale</MessageBox>
-                      ) : (
-                        <Chart
-                          width="90%"
-                          height="300px"
-                          chartType="Line"
-                          loader={<div>Loading Chart...</div>}
-                          data={[
-                            ['Date', 'Sales'],
-                            ...summary.yearlyOrders.map((x) => [
-                              x._id,
-                              x.sales,
-                            ]),
-                          ]}
-                        ></Chart>
-                      )}
-                    </div>
+                {summary.monthlyOrders.length === 0 ? (
+                  <MessageBox>No Sale</MessageBox>
+                ) : (
+                  <Chart
+                    width="100%"
+                    height="400px"
+                    chartType="AreaChart"
+                    loader={<div>Loading Chart...</div>}
+                    data={[
+                      ['Date', 'Sales'],
+                      ...summary.monthlyOrders.map((x) => [x._id, x.sales]),
+                    ]}
+                    options={{
+                      title: 'Monthly Sales',
+                      colors: ['#FFA500'],
+                      hAxis: {
+                        title: 'Date',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      vAxis: {
+                        title: 'Sales',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      legend: { position: 'bottom' },
+                      backgroundColor: '#f9f9f9',
+                    }}
+                  />
+                )}
+              </div>
+            </Col>
+          )}
+
+          {activeSection === 'yearlySales' && (
+            <Col md={12} className="chartdesign">
+              <div className="my-3">
+                <Row>
+                  <Col md={8}>
+                    <h3>Yearly Sales</h3>
                   </Col>
-                </div>
-              )}
-            </Col>
-            <Col md={12}>
-              {showDivOrder && (
-                <div className="my-3">
-                  <Row>
-                    <Col md={8}>
-                      <h3>Daily Orders</h3>
-                    </Col>
-                    <Col md={4}></Col>
-                  </Row>
+                  <Col md={4}></Col>
+                </Row>
 
-                  {summary.dailyOrders.length === 0 ? (
-                    <MessageBox>No Orders</MessageBox>
-                  ) : (
-                    <Chart
-                      width="90%"
-                      height="400px"
-                      chartType="Bar"
-                      loader={<div>Loading Chart...</div>}
-                      data={[
-                        ['Date', 'Orders'],
-                        ...summary.dailyOrdersCount.map((x) => [
-                          x._id,
-                          x.orders,
-                        ]),
-                      ]}
-                      options={{
-                        colors: ['#FFA500'], // Set the color to orange
-                      }}
-                    ></Chart>
-                  )}
-                </div>
-              )}
+                {summary.yearlyOrders.length === 0 ? (
+                  <MessageBox>No Sale</MessageBox>
+                ) : (
+                  <Chart
+                    width="100%"
+                    height="400px"
+                    chartType="LineChart"
+                    loader={<div>Loading Chart...</div>}
+                    data={[
+                      ['Date', 'Sales'],
+                      ...summary.yearlyOrders.map((x) => [x._id, x.sales]),
+                    ]}
+                    options={{
+                      title: 'Yearly Sales',
+                      colors: ['#FFA500'],
+                      hAxis: {
+                        title: 'Date',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      vAxis: {
+                        title: 'Sales',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      legend: { position: 'bottom' },
+                      backgroundColor: '#f9f9f9',
+                    }}
+                  />
+                )}
+              </div>
             </Col>
-            <Col md={6}>
-              {showDivOrderMonth && (
-                <div className="my-3">
-                  <Row>
-                    <Col md={8}>
-                      <h3>Monthly Orders</h3>
-                    </Col>
-                    <Col md={4}></Col>
-                  </Row>
+          )}
 
-                  {summary.monthlyOrderCount.length === 0 ? (
-                    <MessageBox>No Orders</MessageBox>
-                  ) : (
-                    <Chart
-                      width="90%"
-                      height="400px"
-                      chartType="LineChart"
-                      loader={<div>Loading Chart...</div>}
-                      data={[
-                        ['Date', 'Orders'],
-                        ...summary.monthlyOrderCount.map((x) => [
-                          x._id,
-                          x.orders,
-                        ]),
-                      ]}
-                      options={{
-                        colors: ['#0cbedd'],
-                      }}
-                    ></Chart>
-                  )}
-                </div>
-              )}
+          {activeSection === 'dailyOrders' && (
+            <Col md={12} className="chartdesign">
+              <div className="my-3">
+                <Row>
+                  <Col md={8}>
+                    <h3>Daily Orders</h3>
+                  </Col>
+                  <Col md={4}></Col>
+                </Row>
+
+                {summary.dailyOrders.length === 0 ? (
+                  <MessageBox>No Orders</MessageBox>
+                ) : (
+                  <Chart
+                    width="100%"
+                    height="400px"
+                    chartType="BarChart"
+                    loader={<div>Loading Chart...</div>}
+                    data={[
+                      ['Date', 'Orders'],
+                      ...summary.dailyOrdersCount.map((x) => [x._id, x.orders]),
+                    ]}
+                    options={{
+                      title: 'Daily Orders',
+                      colors: ['#FFA500'],
+                      hAxis: {
+                        title: 'Date',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      vAxis: {
+                        title: 'Orders',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      legend: { position: 'bottom' },
+                      backgroundColor: '#f9f9f9',
+                    }}
+                  />
+                )}
+              </div>
             </Col>
-            <Col md={6}>
-              {showDivOrderYear && (
-                <div className="my-3">
-                  <Row>
-                    <Col md={8}>
-                      <h3>Yearly Orders</h3>
-                    </Col>
-                  </Row>
+          )}
 
-                  {summary.yearlyOrderCount.length === 0 ? (
-                    <MessageBox>No Orders</MessageBox>
-                  ) : (
-                    <Chart
-                      width="90%"
-                      height="400px"
-                      chartType="BarChart"
-                      loader={<div>Loading Chart...</div>}
-                      data={[
-                        ['Date', 'Orders'],
-                        ...summary.yearlyOrderCount.map((x) => [
-                          x._id,
-                          x.orders,
-                        ]),
-                      ]}
-                      options={{
-                        colors: ['#0cbedd'],
-                      }}
-                    ></Chart>
-                  )}
-                </div>
-              )}
+          {activeSection === 'monthlyOrders' && (
+            <Col md={12} className="chartdesign">
+              <div className="my-3">
+                <Row>
+                  <Col md={8}>
+                    <h3>Monthly Orders</h3>
+                  </Col>
+                  <Col md={4}></Col>
+                </Row>
+
+                {summary.monthlyOrderCount.length === 0 ? (
+                  <MessageBox>No Orders</MessageBox>
+                ) : (
+                  <Chart
+                    width="100%"
+                    height="400px"
+                    chartType="LineChart"
+                    loader={<div>Loading Chart...</div>}
+                    data={[
+                      ['Date', 'Orders'],
+                      ...summary.monthlyOrderCount.map((x) => [
+                        x._id,
+                        x.orders,
+                      ]),
+                    ]}
+                    options={{
+                      title: 'Monthly Orders',
+                      colors: ['#0cbedd'],
+                      hAxis: {
+                        title: 'Date',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      vAxis: {
+                        title: 'Orders',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      legend: { position: 'bottom' },
+                      backgroundColor: '#f9f9f9',
+                    }}
+                  />
+                )}
+              </div>
             </Col>
-          </Row>
+          )}
 
-          <Row>
-            <Col md={4}>
-              {showDivOrderCity && (
-                <div className="my-3">
-                  <Row>
-                    <Col md={8}>
-                      <h3>Orders by City</h3>
-                    </Col>
-                    <Col md={4}></Col>
-                  </Row>
+          {activeSection === 'yearlyOrders' && (
+            <Col md={12} className="chartdesign">
+              <div className="my-3">
+                <Row>
+                  <Col md={8}>
+                    <h3>Yearly Orders</h3>
+                  </Col>
+                </Row>
 
-                  {summary.ordersByCity.length === 0 ? (
-                    <MessageBox>No Orders</MessageBox>
-                  ) : (
-                    <Chart
-                      width="90%"
-                      height="400px"
-                      chartType="PieChart"
-                      loader={<div>Loading Chart...</div>}
-                      data={[
-                        ['City', 'Orders'],
-                        ...summary.ordersByCity.map((x) => [x._id, x.count]),
-                      ]}
-                    ></Chart>
-                  )}
-                </div>
-              )}
+                {summary.yearlyOrderCount.length === 0 ? (
+                  <MessageBox>No Orders</MessageBox>
+                ) : (
+                  <Chart
+                    width="100%"
+                    height="400px"
+                    chartType="BarChart"
+                    loader={<div>Loading Chart...</div>}
+                    data={[
+                      ['Date', 'Orders'],
+                      ...summary.yearlyOrderCount.map((x) => [x._id, x.orders]),
+                    ]}
+                    options={{
+                      title: 'Yearly Orders',
+                      colors: ['#0cbedd'],
+                      hAxis: {
+                        title: 'Date',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      vAxis: {
+                        title: 'Orders',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      legend: { position: 'bottom' },
+                      backgroundColor: '#f9f9f9',
+                    }}
+                  />
+                )}
+              </div>
             </Col>
-            <Col md={8}>
-              {showDivCustomerCity && (
-                <div className="my-3">
-                  <Row>
-                    <Col md={8}>
-                      <h3>Customers by City</h3>
-                    </Col>
-                    <Col md={4}></Col>
-                  </Row>
+          )}
 
-                  {summary.usersByCity.length === 0 ? (
-                    <MessageBox>No Customers</MessageBox>
-                  ) : (
-                    <Chart
-                      width="90%"
-                      height="300px"
-                      chartType="Bar"
-                      loader={<div>Loading Chart...</div>}
-                      data={[
-                        ['City', 'Customers'],
-                        ...summary.usersByCity.map((x) => [x._id, x.numUsers]),
-                      ]}
-                      options={{
-                        colors: ['#FFA500'],
-                      }}
-                    ></Chart>
-                  )}
-                </div>
-              )}
+          {activeSection === 'ordersByCity' && (
+            <Col md={12} className="chartdesign">
+              <div className="my-3">
+                <Row>
+                  <Col md={8}>
+                    <h3>Orders by City</h3>
+                  </Col>
+                  <Col md={4}></Col>
+                </Row>
+
+                {summary.ordersByCity.length === 0 ? (
+                  <MessageBox>No Orders</MessageBox>
+                ) : (
+                  <Chart
+                    width="100%"
+                    height="400px"
+                    chartType="PieChart"
+                    loader={<div>Loading Chart...</div>}
+                    data={[
+                      ['City', 'Orders'],
+                      ...summary.ordersByCity.map((x) => [x._id, x.count]),
+                    ]}
+                    options={{
+                      title: 'Orders by City',
+                      colors: [
+                        '#FFA500',
+                        '#FF6347',
+                        '#FFD700',
+                        '#32CD32',
+                        '#1E90FF',
+                      ],
+                      legend: { position: 'bottom' },
+                      backgroundColor: '#f9f9f9',
+                    }}
+                  />
+                )}
+              </div>
             </Col>
-          </Row>
+          )}
+
+          {activeSection === 'customersByCity' && (
+            <Col md={12} className="chartdesign">
+              <div className="my-3">
+                <Row>
+                  <Col md={8}>
+                    <h3>Customers by City</h3>
+                  </Col>
+                  <Col md={4}></Col>
+                </Row>
+
+                {summary.usersByCity.length === 0 ? (
+                  <MessageBox>No Customers</MessageBox>
+                ) : (
+                  <Chart
+                    width="100%"
+                    height="400px"
+                    chartType="BarChart"
+                    loader={<div>Loading Chart...</div>}
+                    data={[
+                      ['City', 'Customers'],
+                      ...summary.usersByCity.map((x) => [x._id, x.numUsers]),
+                    ]}
+                    options={{
+                      title: 'Customers by City',
+                      colors: ['#FFA500'],
+                      hAxis: {
+                        title: 'City',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      vAxis: {
+                        title: 'Customers',
+                        textStyle: { color: '#333' },
+                        titleTextStyle: { color: '#333', fontSize: 18 },
+                      },
+                      legend: { position: 'bottom' },
+                      backgroundColor: '#f9f9f9',
+                    }}
+                  />
+                )}
+              </div>
+            </Col>
+          )}
         </>
       )}
     </div>

@@ -19,7 +19,6 @@ userRouter.get(
 userRouter.get(
   '/:id',
   isAuth,
-  isAdmin,
   expressAsyncHandler(async (req, res) => {
     const user = await User.findById(req.params.id);
     if (user) {
