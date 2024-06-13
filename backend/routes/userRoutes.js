@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import expressAsyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import { isAuth, isAdmin, generateToken } from '../utils.js';
+import { sendWelcomeEmail } from '../emailwelcome.js';
 import { sendProfileUpdateEmail } from '../emailprofile.js';
 
 const userRouter = express.Router();
@@ -102,16 +103,33 @@ userRouter.post(
 userRouter.post(
   `/signup`,
   expressAsyncHandler(async (req, res) => {
+    const { name, email, mobileNo, city, address, password } = req.body;
+
+    // Check if user with the same email already exists
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      res.status(400).send({ message: 'Email is already registered' });
+      return;
+    }
+
+    // Create new user
     const newUser = new User({
-      name: req.body.name,
-      email: req.body.email,
-      mobileNo: req.body.mobileNo,
-      city: req.body.city,
-      address: req.body.address,
-      password: bcrypt.hashSync(req.body.password),
+      name,
+      email,
+      mobileNo,
+      city,
+      address,
+      password: bcrypt.hashSync(password),
     });
+
+    // Save the new user
     const user = await newUser.save();
-    res.send({
+
+    // Send welcome email to the user
+    sendWelcomeEmail(user.email, user.name);
+
+    res.status(201).send({
       _id: user._id,
       name: user.name,
       email: user.email,

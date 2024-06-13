@@ -1,0 +1,24 @@
+.notification-box {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1000;
+}
+
+.notification-message {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.notification-message:last-child {
+  margin-bottom: 0;
+}
