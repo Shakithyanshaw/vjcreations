@@ -37,8 +37,8 @@ import UserEditScreen from './admin screens/UserEditScreen';
 import SellerScreen from './admin screens/SellerScreen';
 import logo from '../src/pics/logo.png';
 import HomeScreen2 from './screens/HomeScreen2';
-//import BookServiceScreen from './screens/BookServiceScreen';
 import AdminCalendarScreen from './admin screens/AdminCalenderScreen';
+
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
@@ -94,10 +94,12 @@ function App() {
               <Navbar.Collapse id="responsive-navbar-nav ">
                 <Nav className="me-auto w-100  justify-content-end">
                   <Link to="/services" className="nav-link">
+                    <i className="fas fa-gift"></i>{' '}
                     <span className="text-light">Gift Shop</span>
                   </Link>
 
                   <Link to="/cart" className="nav-link">
+                    <i className="fas fa-shopping-cart"></i>{' '}
                     <span className="text-light">Cart</span>
                     {cart.cartItems.length > 0 && (
                       <Badge pill bg="danger">
@@ -108,57 +110,82 @@ function App() {
 
                   {userInfo ? (
                     <NavDropdown
-                      title={userInfo.name}
+                      title={
+                        <>
+                          <i className="fas fa-user"></i> {userInfo.name}
+                        </>
+                      }
                       id="collasible-nav-dropdown"
                     >
                       <LinkContainer to="/profile">
                         <NavDropdown.Item>
+                          <i className="fas fa-user"></i>{' '}
                           <span className="text-dark">User Profile</span>
                         </NavDropdown.Item>
                       </LinkContainer>
 
                       <LinkContainer to="/orderhistory">
                         <NavDropdown.Item>
+                          <i className="fas fa-history"></i>{' '}
                           <span className="text-dark">Order History</span>
                         </NavDropdown.Item>
                       </LinkContainer>
 
                       <NavDropdown.Divider />
-                      <Link
-                        className="dropdown-item"
-                        to="#signout"
-                        onClick={signoutHandler}
-                      >
+                      <NavDropdown.Item onClick={signoutHandler}>
+                        <i className="fas fa-sign-out-alt"></i>{' '}
                         <span className="text-dark">Signout</span>
-                      </Link>
+                      </NavDropdown.Item>
                     </NavDropdown>
                   ) : (
                     <Link className="nav-link" to="/signin">
+                      <i className="fas fa-sign-in-alt"></i>{' '}
                       <span className="text-light">Signin</span>
                     </Link>
                   )}
                   {userInfo && userInfo.isAdmin && (
-                    <NavDropdown title="Admin" id="admin-nav-dropdown">
+                    <NavDropdown
+                      title={
+                        <>
+                          <i className="fas fa-cog"></i> Admin
+                        </>
+                      }
+                      id="admin-nav-dropdown"
+                    >
                       <LinkContainer to="/admin/dashboard">
-                        <NavDropdown.Item>Dashboard</NavDropdown.Item>
+                        <NavDropdown.Item>
+                          <i className="fas fa-tachometer-alt"></i> Dashboard
+                        </NavDropdown.Item>
                       </LinkContainer>
                       <LinkContainer to="/admin/products">
-                        <NavDropdown.Item>Products</NavDropdown.Item>
+                        <NavDropdown.Item>
+                          <i className="fas fa-boxes"></i> Products
+                        </NavDropdown.Item>
                       </LinkContainer>
                       <LinkContainer to="/admin/orders">
-                        <NavDropdown.Item>Orders</NavDropdown.Item>
+                        <NavDropdown.Item>
+                          <i className="fas fa-list-alt"></i> Orders
+                        </NavDropdown.Item>
                       </LinkContainer>
                       <LinkContainer to="/admin/users">
-                        <NavDropdown.Item>Users</NavDropdown.Item>
+                        <NavDropdown.Item>
+                          <i className="fas fa-users"></i> Users
+                        </NavDropdown.Item>
                       </LinkContainer>
                       <LinkContainer to="/admin/sellers">
-                        <NavDropdown.Item>Sellers</NavDropdown.Item>
+                        <NavDropdown.Item>
+                          <i className="fas fa-store"></i> Sellers
+                        </NavDropdown.Item>
                       </LinkContainer>
                       <LinkContainer to="/admin/calendar">
-                        <NavDropdown.Item>Calendar</NavDropdown.Item>
+                        <NavDropdown.Item>
+                          <i className="fas fa-calendar-alt"></i> Calendar
+                        </NavDropdown.Item>
                       </LinkContainer>
                       <LinkContainer to="/admin/support">
-                        <NavDropdown.Item>Support</NavDropdown.Item>
+                        <NavDropdown.Item>
+                          <i className="fas fa-life-ring"></i> Support
+                        </NavDropdown.Item>
                       </LinkContainer>
                     </NavDropdown>
                   )}
