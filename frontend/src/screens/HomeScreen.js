@@ -8,6 +8,9 @@ import { Helmet } from 'react-helmet-async';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import Pagination from 'react-bootstrap/Pagination';
+import Chatbox from '../components/Chatbox';
+import Modal from 'react-bootstrap/Modal';
+import { FaComments } from 'react-icons/fa';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -31,6 +34,7 @@ function HomeScreen() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8;
+  const [showChatbox, setShowChatbox] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,11 +67,26 @@ function HomeScreen() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const handleShowChatbox = () => setShowChatbox(true);
+  const handleCloseChatbox = () => setShowChatbox(false);
+
   return (
     <div>
       <Helmet>
         <title>VJ-Creations</title>
       </Helmet>
+      <div className="chatbox-icon" onClick={handleShowChatbox}>
+        <FaComments size={32} />
+      </div>
+
+      <Modal show={showChatbox} onHide={handleCloseChatbox} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Chat with us</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Chatbox />
+        </Modal.Body>
+      </Modal>
       <h1>Our Services</h1>
       <div className="products">
         {loading ? (
