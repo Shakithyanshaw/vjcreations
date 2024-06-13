@@ -44,7 +44,7 @@ export default function ProfileScreen() {
     }
     try {
       const { data } = await axios.put(
-        '/api/users/profile',
+        '/api/users/profile/update', // Update endpoint URL
         {
           name,
           email,
@@ -65,7 +65,7 @@ export default function ProfileScreen() {
       toast.success('User updated successfully');
     } catch (err) {
       dispatch({
-        type: 'FETCH_FAIL',
+        type: 'UPDATE_FAIL',
       });
       toast.error(getError(err));
     }

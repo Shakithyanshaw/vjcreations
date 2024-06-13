@@ -5,6 +5,7 @@ import User from '../models/userModel.js';
 import Product from '../models/productModel.js';
 import { isAuth, isAdmin } from '../utils.js';
 import { sendOrderConfirmationEmail } from '../emailService.js';
+import { sendOrderDeletionEmail } from '../sendOrderDeletionEmail.js';
 
 const orderRouter = express.Router();
 
@@ -457,13 +458,24 @@ orderRouter.delete(
     try {
       const order = await Order.findById(req.params.id);
       if (order) {
-        await order.deleteOne(); // Use deleteOne method instead of remove
+        // Find the user associated with the order
+        const user = await User.findById(order.user);
+        if (user) {
+          // Send deletion email to the user who made the order
+          await sendOrderDeletionEmail(user.email, user.name, order);
+        } else {
+          console.error('User not found for order:', order._id);
+        }
+
+        // Delete the order
+        await order.deleteOne();
+
         res.status(200).send({ success: true, message: 'Order Deleted' });
       } else {
         res.status(404).send({ success: false, message: 'Order Not Found' });
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error deleting order:', error);
       res
         .status(500)
         .send({ success: false, message: 'Internal Server Error' });

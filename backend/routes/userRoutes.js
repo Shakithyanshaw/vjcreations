@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import expressAsyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import { isAuth, isAdmin, generateToken } from '../utils.js';
+import { sendProfileUpdateEmail } from '../emailprofile.js';
 
 const userRouter = express.Router();
 
@@ -124,11 +125,12 @@ userRouter.post(
 );
 
 userRouter.put(
-  '/profile',
+  '/profile/update',
   isAuth,
   expressAsyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     if (user) {
+      const originalUser = { ...user._doc }; // Make a copy of the original user document
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
       user.city = req.body.city || user.city;
@@ -139,6 +141,22 @@ userRouter.put(
       }
 
       const updatedUser = await user.save();
+
+      // Determine updated fields
+      const updatedFields = {};
+      Object.keys(originalUser).forEach((key) => {
+        if (originalUser[key] !== updatedUser[key]) {
+          updatedFields[key] = updatedUser[key];
+        }
+      });
+
+      // Send email notification with updated fields
+      sendProfileUpdateEmail(
+        updatedUser.email,
+        updatedUser.name,
+        updatedFields
+      );
+
       res.send({
         _id: updatedUser._id,
         name: updatedUser.name,
