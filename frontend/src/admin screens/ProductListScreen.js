@@ -12,6 +12,7 @@ import { getError } from '../utils';
 import Badge from 'react-bootstrap/Badge';
 import Table from 'react-bootstrap/Table';
 
+// Reducer function to handle various action types
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -80,6 +81,7 @@ export default function ProductListScreen() {
   const { state } = useContext(Store);
   const { userInfo } = state;
 
+  // Fetch product data whenever the page, userInfo, or successDelete changes
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -97,6 +99,7 @@ export default function ProductListScreen() {
     }
   }, [page, userInfo, successDelete]);
 
+  // Handle creating a new product
   const createHandler = async () => {
     if (window.confirm('Are you sure to create a Product?')) {
       try {
@@ -111,7 +114,6 @@ export default function ProductListScreen() {
         const { data } = await axios.post(
           '/api/products',
           {
-            // Include the type field in the request body
             type: type,
           },
           {
@@ -131,6 +133,7 @@ export default function ProductListScreen() {
     }
   };
 
+  // Handle deleting a product
   const deleteHandler = async (product) => {
     if (window.confirm('Are you sure to delete?')) {
       try {
@@ -151,6 +154,7 @@ export default function ProductListScreen() {
     }
   };
 
+  // Handle printing the page
   const handlePrint = () => {
     window.print();
   };

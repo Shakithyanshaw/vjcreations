@@ -40,9 +40,11 @@ import HomeScreen2 from './screens/HomeScreen2';
 import AdminCalendarScreen from './admin screens/AdminCalenderScreen';
 
 function App() {
+  // Access global state and dispatch function from the Store context
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
 
+  // Sign out handler to clear user info and relevant local storage, and redirect to signin page
   const signoutHandler = () => {
     ctxDispatch({ type: 'USER_SIGNOUT' });
     localStorage.removeItem('userInfo');
@@ -51,9 +53,11 @@ function App() {
     window.location.href = '/signin';
   };
 
+  // States for managing sidebar visibility and categories
   const [sidebarIsOpen, setSidebarIsOpen] = useState(false);
   const [categories, setCategories] = useState([]);
 
+  // Fetch categories from API and handle errors
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -75,6 +79,8 @@ function App() {
             : 'd-flex flex-column site-container'
         }
       >
+        {' '}
+        {/* Toast container for displaying notifications */}
         <ToastContainer position="bottom-center" limit={1} />
         <header>
           <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -107,7 +113,7 @@ function App() {
                       </Badge>
                     )}
                   </Link>
-
+                  {/* Display user dropdown menu if user is signed in */}
                   {userInfo ? (
                     <NavDropdown
                       title={
@@ -143,6 +149,7 @@ function App() {
                       <span className="text-light">Signin</span>
                     </Link>
                   )}
+                  {/* Display admin dropdown menu if user is an admin */}
                   {userInfo && userInfo.isAdmin && (
                     <NavDropdown
                       title={
@@ -195,6 +202,7 @@ function App() {
           </Navbar>
           <SearchBox />
         </header>
+        {/* Sidebar for categories */}
         <div
           className={
             sidebarIsOpen
@@ -218,6 +226,7 @@ function App() {
             ))}
           </Nav>
         </div>
+        {/* Main content area */}
         <main>
           <Container className="mt-3">
             <Routes>
@@ -229,6 +238,7 @@ function App() {
               <Route path="/signup" element={<SignupScreen />} />
               <Route path="/services" element={<HomeScreen2 />} />
               {/* <Route path="/book-service/:id" element={<BookServiceScreen />} /> */}
+              {/* Protected routes */}
               <Route
                 path="/placeorder"
                 element={
@@ -340,6 +350,8 @@ function App() {
               ></Route>
             </Routes>
           </Container>
+
+          {/* Footer section */}
         </main>
         <footer className="bg-dark text-light">
           <section className="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">

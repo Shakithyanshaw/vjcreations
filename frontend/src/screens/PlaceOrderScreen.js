@@ -18,6 +18,7 @@ import {
   usePayPalScriptReducer,
 } from '@paypal/react-paypal-js';
 
+// Reducer function to handle different action types
 const reducer = (state, action) => {
   switch (action.type) {
     case 'CREATE_REQUEST':
@@ -37,13 +38,16 @@ export default function PlaceOrderScreen() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
 
+  // Round number to 2 decimal places
   const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100;
+  // Calculate prices
   cart.itemsPrice = round2(
     cart.cartItems.reduce((a, c) => a + c.quantity * c.price, 0)
   );
   cart.shippingPrice = cart.itemsPrice > 100 ? round2(0) : round2(10);
   cart.taxPrice = round2(0.06 * cart.itemsPrice);
 
+  // Function to get discount percentage based on total price
   const getDiscountPercentage = (totalPrice) => {
     if (totalPrice >= 600000) return 10;
     if (totalPrice >= 300000) return 7;
@@ -53,14 +57,14 @@ export default function PlaceOrderScreen() {
     if (totalPrice >= 0) return 1;
     return 0;
   };
-
+  // Calculate discount and total price
   const discountPercentage = getDiscountPercentage(cart.itemsPrice);
   const discountAmount = round2((cart.itemsPrice * discountPercentage) / 100);
   cart.totalPrice =
     cart.itemsPrice + cart.shippingPrice + cart.taxPrice - discountAmount;
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
-
+  // Function to handle order placement
   const placeOrderHandler = async () => {
     try {
       dispatch({ type: 'CREATE_REQUEST' });
@@ -92,6 +96,7 @@ export default function PlaceOrderScreen() {
     }
   };
 
+  // Load PayPal script if PayPal is the payment method
   useEffect(() => {
     if (!cart.paymentMethod) {
       navigate('/payment');

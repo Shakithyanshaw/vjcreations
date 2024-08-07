@@ -13,21 +13,23 @@ export default function PaymentMethodScreen() {
   const {
     cart: { shippingAddress, paymentMethod },
   } = state;
-
+  // Initialize payment method state with current payment method or default to 'PayPal'
   const [paymentMethodName, setPaymentMethod] = useState(
     paymentMethod || 'PayPal'
   );
-
+  // Redirect to shipping if no shipping address is available
   useEffect(() => {
     if (!shippingAddress.address) {
       Navigate('/shipping');
     }
   }, [shippingAddress, Navigate]);
-
+  // Handle form submission
   const submitHandler = (e) => {
     e.preventDefault();
+    // Save selected payment method to context and local storage
     ctxDispatch({ type: 'SAVE_PAYMENT_METHOD', payload: paymentMethodName });
     localStorage.setItem('paymentMethod', paymentMethodName);
+    // Navigate to place order screen
     Navigate('/placeorder');
   };
 

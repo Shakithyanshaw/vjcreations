@@ -6,9 +6,12 @@ import FormControl from 'react-bootstrap/FormControl';
 import { useNavigate } from 'react-router-dom';
 import '../style/search.css';
 
+// Component for the search box
 export default function SearchBox() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+
+  // Handle form submission
   const submitHandler = (e) => {
     e.preventDefault();
     navigate(query ? `/search/?query=${query}` : '/search');

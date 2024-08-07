@@ -11,8 +11,8 @@ import Card from 'react-bootstrap/Card';
 import Chart from 'react-google-charts';
 import { useNavigate } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
-//import Badge from 'react-bootstrap/Badge';
 
+// Reducer function to manage state transitions
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -40,6 +40,7 @@ const formatPrice = (price) => {
 
 export default function DashboardScreen() {
   const navigate = useNavigate();
+  // useReducer hook to manage state
   const [{ loading, summary, error }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
@@ -50,6 +51,7 @@ export default function DashboardScreen() {
   );
   const { userInfo } = state;
 
+  // useEffect to fetch data and set up interval for date-time update
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -73,10 +75,12 @@ export default function DashboardScreen() {
     return () => clearInterval(interval);
   }, [userInfo]);
 
+  // Handler for printing the page
   const handlePrint = () => {
     window.print();
   };
 
+  // Handlers for navigating to different admin pages
   const handleUser = () => {
     navigate(`/admin/users`);
   };
@@ -86,17 +90,9 @@ export default function DashboardScreen() {
   const handleProducts = () => {
     navigate(`/admin/products`);
   };
-
-  //const [showDiv, setShowDiv] = useState(false);
-  //const [showDivOrder, setShowDivOrder] = useState(false);
-  // const [showDivOrderMonth, setShowDivOrderMonth] = useState(false);
-  // [showDivOrderYear, setShowDivOrderYear] = useState(false);
-  //const [showDivOrderCity, setShowDivOrderCity] = useState(false);
-  //const [showDivCustomerCity, setShowDivCustomerCity] = useState(false);
-  // [showMonthSaleDiv, setShowMonthSaleDiv] = useState(false);
-
+  // State for managing active section in the dashboard
   const [activeSection, setActiveSection] = useState(null);
-
+  // Handlers for toggling sections in the dashboard
   const handleMonthSale = () => {
     setActiveSection(activeSection === 'monthlySales' ? null : 'monthlySales');
   };

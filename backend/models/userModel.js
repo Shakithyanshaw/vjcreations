@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// Define the schema for users
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -11,9 +12,10 @@ const userSchema = new mongoose.Schema(
     isAdmin: { type: Boolean, default: false, required: true },
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically create `createdAt` and `updatedAt` timestamps
   }
 );
 
+// Create the User model from the schema
 const User = mongoose.model('User', userSchema);
 export default User;

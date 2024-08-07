@@ -5,6 +5,7 @@ import Product from '../models/productModel.js';
 
 const productRouter = express.Router();
 
+// Route to get all products
 productRouter.get(
   `/`,
   expressAsyncHandler(async (req, res) => {
@@ -13,6 +14,7 @@ productRouter.get(
   })
 );
 
+// Route to create a new product (admin only)
 productRouter.post(
   '/',
   isAuth,
@@ -26,6 +28,7 @@ productRouter.post(
           .status(400)
           .send({ message: 'Invalid or missing product type' });
       }
+      // Create a new product with default values and the provided 'type'
       const newProduct = new Product({
         name: 'Name ' + Date.now(),
         slug: 'Name-' + Date.now(),
@@ -48,6 +51,7 @@ productRouter.post(
   })
 );
 
+// Route to update an existing product (admin only)
 productRouter.put(
   '/:id',
   isAuth,
@@ -81,6 +85,7 @@ productRouter.put(
   })
 );
 
+// Route to delete a product (admin only)
 productRouter.delete(
   '/:id',
   isAuth,
@@ -97,6 +102,7 @@ productRouter.delete(
   })
 );
 
+// Route to add a review to a product
 productRouter.post(
   '/:id/reviews',
   isAuth,
@@ -123,11 +129,11 @@ productRouter.post(
       if (!product.reviews) {
         product.reviews = [];
       }
-      product.reviews.push(review);
-      product.numReviews = product.reviews.length;
+      product.reviews.push(review); // Add the new review to the product
+      product.numReviews = product.reviews.length; // Update the number of reviews
       product.rating =
         product.reviews.reduce((a, c) => c.rating + a, 0) /
-        product.reviews.length;
+        product.reviews.length; // Update the average rating
       const updatedProduct = await product.save();
       res.status(201).send({
         message: 'Review Created',
@@ -143,6 +149,7 @@ productRouter.post(
 
 const PAGE_SIZE = 8;
 
+// Route to get products for admin with pagination
 productRouter.get(
   '/admin',
   isAuth,
@@ -165,6 +172,7 @@ productRouter.get(
   })
 );
 
+// Route to search for products with filters and pagination
 productRouter.get(
   '/search',
   expressAsyncHandler(async (req, res) => {
@@ -243,6 +251,7 @@ productRouter.get(
   })
 );
 
+// Route to get all distinct categories
 productRouter.get(
   '/categories',
   expressAsyncHandler(async (req, res) => {
@@ -251,6 +260,7 @@ productRouter.get(
   })
 );
 
+// Route to get a product by its slug
 productRouter.get(`/slug/:slug`, async (req, res) => {
   const product = await Product.findOne({ slug: req.params.slug });
   if (product) {
@@ -260,6 +270,7 @@ productRouter.get(`/slug/:slug`, async (req, res) => {
   }
 });
 
+// Route to get a product by its ID
 productRouter.get(`/:id`, async (req, res) => {
   const product = await Product.findById(req.params.id);
   if (product) {

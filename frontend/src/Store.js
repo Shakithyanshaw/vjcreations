@@ -1,7 +1,7 @@
 import { createContext, useReducer } from 'react';
 
 export const Store = createContext();
-
+// Initialize state with values from local storage, if available
 const initialState = {
   userInfo: localStorage.getItem('userInfo')
     ? JSON.parse(localStorage.getItem('userInfo'))
@@ -18,11 +18,11 @@ const initialState = {
       : [],
   },
 };
-
+// Reducer function to handle state changes based on action types
 function reducer(state, action) {
   switch (action.type) {
     case 'CART_ADD_ITEM':
-      //addtocart
+      // Add item to cart
       const newItem = action.payload;
       const existItem = state.cart.cartItems.find(
         (item) => item._id === newItem._id
@@ -32,21 +32,25 @@ function reducer(state, action) {
             item._id === existItem._id ? newItem : item
           )
         : [...state.cart.cartItems, newItem];
-      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+      localStorage.setItem('cartItems', JSON.stringify(cartItems)); // Save cart items to local storage
       return { ...state, cart: { ...state.cart, cartItems } };
     case 'CART_REMOVE_ITEM': {
+      // Remove item from cart
       const cartItems = state.cart.cartItems.filter(
         (item) => item._id !== action.payload._id
       );
-      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+      localStorage.setItem('cartItems', JSON.stringify(cartItems)); // Save updated cart items to local storage
       return { ...state, cart: { ...state.cart, cartItems } };
     }
     case 'CART_CLEAR':
+      // Clear all items from the cart
       localStorage.removeItem('cartItems'); // Clear cart items from local storage
       return { ...state, cart: { ...state.cart, cartItems: [] } };
     case 'USER_SIGNIN':
+      // Sign in user
       return { ...state, userInfo: action.payload };
     case 'USER_SIGNOUT':
+      // Sign out user and clear relevant local storage
       localStorage.removeItem('userInfo');
       localStorage.removeItem('cartItems'); // Clear cart items from local storage
       localStorage.removeItem('shippingAddress');

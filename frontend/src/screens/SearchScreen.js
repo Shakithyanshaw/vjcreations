@@ -12,6 +12,7 @@ import LoadingBox from '../components/LoadingBox';
 import { Helmet } from 'react-helmet-async';
 import { getError } from '../utils';
 
+// Reducer function to manage the state of product search
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -32,7 +33,7 @@ const reducer = (state, action) => {
       return state;
   }
 };
-
+// Array of price ranges for filtering
 const prices = [
   {
     name: 'Rs 1 to Rs 1000',
@@ -63,7 +64,7 @@ const prices = [
     value: '100001-500001',
   },
 ];
-
+// Array of rating filters
 export const ratings = [
   {
     name: '4stars & up',
@@ -89,20 +90,22 @@ export const ratings = [
 export default function SearchScreen() {
   const navigate = useNavigate();
   const { search } = useLocation();
-  const sp = new URLSearchParams(search); // /search?category=Shirts
+  const sp = new URLSearchParams(search); // /search?category=decoration
+
+  // Extract query parameters or set defaults
   const category = sp.get('category') || 'all';
   const query = sp.get('query') || 'all';
   const price = sp.get('price') || 'all';
   const rating = sp.get('rating') || 'all';
   const order = sp.get('order') || 'newest';
   const page = sp.get('page') || 1;
-
+  // State management for product search results
   const [{ loading, error, products = [], pages, countProducts }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: '',
     });
-
+  // Fetch product data based on search parameters
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -119,7 +122,7 @@ export default function SearchScreen() {
     };
     fetchData();
   }, [category, error, order, page, price, query, rating]);
-
+  // State management for product categories
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     const fetchCategories = async () => {
@@ -132,7 +135,7 @@ export default function SearchScreen() {
     };
     fetchCategories();
   }, [dispatch]);
-
+  // Generate URL with filters for navigation
   const getFilterUrl = (filter) => {
     const filterPage = filter.page || page;
     const filterCategory = filter.category || category;

@@ -8,7 +8,6 @@ import { useContext, useEffect, useState } from 'react';
 import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import { getError } from '../utils';
-//import back from '../pics/back.jpg';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../style/SigninScreen.css';
@@ -41,6 +40,7 @@ export default function SigninScreen() {
     }
   };
 
+  // Effect to navigate if user is already signed in
   useEffect(() => {
     if (userInfo) {
       navigate(redirect);

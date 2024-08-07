@@ -1,3 +1,4 @@
+//mail for profile update
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -5,8 +6,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false, // true for 465, false for other ports
   auth: {
-    user: '123@gmail.com',
-    pass: '123',
+    user: 'jeyakumarshakithyan@gmail.com',
+    pass: 'vsehajwjhikmuopb',
   },
 });
 

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// Define the schema for order items
 const orderSchema = new mongoose.Schema(
   {
     orderItems: [
@@ -11,11 +12,12 @@ const orderSchema = new mongoose.Schema(
         price: { type: Number, required: true },
         product: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'Product',
+          ref: 'Product', // Reference to the Product model
           required: true,
         },
       },
     ],
+    // Define the schema for the shipping address
     shippingAddress: {
       fullName: { type: String, required: true },
       address: { type: String, required: true },
@@ -43,9 +45,9 @@ const orderSchema = new mongoose.Schema(
     deliveredAt: { type: Date },
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically create `createdAt` and `updatedAt` timestamps
   }
 );
-
+// Create the Order model from the schema
 const Order = mongoose.model('Order', orderSchema);
 export default Order;

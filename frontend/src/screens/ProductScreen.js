@@ -19,6 +19,7 @@ import { toast } from 'react-toastify';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
+// Reducer function to manage component state
 const reducer = (state, action) => {
   switch (action.type) {
     case 'REFRESH_PRODUCT':
@@ -41,8 +42,10 @@ const reducer = (state, action) => {
 };
 
 function ProductScreen() {
+  // Reference to the reviews section to scroll to it after submitting a review
   let reviewsRef = useRef();
 
+  // State to manage form inputs and date selection
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [selectedImage, setSelectedImage] = useState('');
@@ -50,7 +53,7 @@ function ProductScreen() {
   const navigate = useNavigate();
   const params = useParams();
   const { slug } = params;
-
+  // State management using useReducer for handling product details and review state
   const [{ loading, error, product, loadingCreateReview }, dispatch] =
     useReducer(reducer, {
       product: {
@@ -59,7 +62,7 @@ function ProductScreen() {
       loading: true,
       error: '',
     });
-
+  // Fetch product details when the component mounts or slug changes
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
@@ -72,10 +75,10 @@ function ProductScreen() {
     };
     fetchData();
   }, [slug]);
-
+  // Access global state from Store context
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
-
+  // Add item to cart handler
   const addToCartHandler = async () => {
     if (!userInfo) {
       navigate('/signin');
@@ -94,7 +97,7 @@ function ProductScreen() {
     });
     navigate('/cart');
   };
-
+  // Submit review handler
   const submitHandler = async (e) => {
     e.preventDefault();
     if (!comment || !rating) {
@@ -138,7 +141,7 @@ function ProductScreen() {
       dispatch({ type: 'CREATE_FAIL' });
     }
   };
-
+  // Book service handler for services type product
   const bookServiceHandler = () => {
     if (!userInfo) {
       navigate('/signin');
@@ -164,7 +167,7 @@ function ProductScreen() {
       toast.error('This item cannot be booked as it is not a service.');
     }
   };
-
+  // Render action button based on product type and user login status
   const renderActionButton = () => {
     if (!userInfo) {
       return (
@@ -191,10 +194,11 @@ function ProductScreen() {
 
   const [selectedDate, setSelectedDate] = useState(null);
 
+  // Handle date change for booking services
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
-
+  // Check if the selected date is within the next seven days
   const isAvailable = (selectedDate) => {
     const currentDate = new Date();
     const nextSevenDates = [...Array(7)].map((_, index) => {
@@ -205,7 +209,7 @@ function ProductScreen() {
 
     return nextSevenDates.some((date) => isSameDay(date, selectedDate));
   };
-
+  // Check if two dates are the same day
   const isSameDay = (date1, date2) => {
     return (
       date1.getDate() === date2.getDate() &&
@@ -213,7 +217,7 @@ function ProductScreen() {
       date1.getFullYear() === date2.getFullYear()
     );
   };
-
+  // Format price to currency format
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-LK', {
       style: 'currency',

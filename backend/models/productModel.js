@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// Define the schema for reviews
 const reviewSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -7,10 +8,10 @@ const reviewSchema = new mongoose.Schema(
     rating: { type: Number, required: true },
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically create `createdAt` and `updatedAt` timestamps
   }
 );
-
+// Define the schema for products
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
@@ -28,9 +29,9 @@ const productSchema = new mongoose.Schema(
     reviews: [reviewSchema],
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically create `createdAt` and `updatedAt` timestamps
   }
 );
-
+// Create the Product model from the schema
 const Product = mongoose.model('Product', productSchema);
 export default Product;

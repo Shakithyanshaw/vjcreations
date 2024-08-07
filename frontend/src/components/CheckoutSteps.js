@@ -2,6 +2,7 @@ import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+// Component to display checkout steps with active state based on props
 export default function CheckoutSteps(props) {
   return (
     <Row className="checkout-steps">

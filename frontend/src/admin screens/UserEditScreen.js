@@ -13,6 +13,7 @@ import { getError } from '../utils';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+// Reducer function to handle different action types
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -33,28 +34,31 @@ const reducer = (state, action) => {
 };
 
 export default function UserEditScreen() {
+  // useReducer hook to manage component state
   const [{ loading, error, loadingUpdate }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
   });
 
+  // useState hooks for form validation and form fields
   const [validated, setValidated] = useState(false);
-
-  const { state } = useContext(Store);
-  const { userInfo } = state;
-
-  const params = useParams();
-  const { id: userId } = params;
-  const navigate = useNavigate();
-
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNo, setMobileNo] = useState('');
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
-  //const [image, setImage] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // useContext to access global state
+  const { state } = useContext(Store);
+  const { userInfo } = state;
+
+  // useParams and useNavigate hooks for route parameters and navigation
+  const params = useParams();
+  const { id: userId } = params;
+  const navigate = useNavigate();
+
+  // useEffect to fetch user data when component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -67,7 +71,6 @@ export default function UserEditScreen() {
         setMobileNo(data.mobileNo);
         setCity(data.city);
         setAddress(data.address);
-        //setImage(data.image);
         setIsAdmin(data.isAdmin);
         dispatch({ type: 'FETCH_SUCCESS' });
       } catch (err) {
@@ -80,6 +83,7 @@ export default function UserEditScreen() {
     fetchData();
   }, [userId, userInfo]);
 
+  // Handler for form submission
   const submitHandler = async (e) => {
     e.preventDefault();
     try {

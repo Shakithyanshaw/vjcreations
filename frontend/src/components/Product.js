@@ -3,13 +3,13 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import { Link, useNavigate } from 'react-router-dom';
 import Rating from './Rating';
-// import axios from 'axios';
-// import { Store } from '../Store';
 
+// Component to display product details in a card
 function Product(props) {
   const { product } = props;
   const navigate = useNavigate();
 
+  // Send product details to the appropriate home screen
   const sendDetailsToHomeScreen = () => {
     if (product.type === 'product') {
       navigate('/', { state: { product } });
@@ -18,6 +18,7 @@ function Product(props) {
     }
   };
 
+  // Handle the "View More" button click
   const handleViewMore = () => {
     if (product.type === 'product') {
       navigate(`/product/${product.slug}`, { state: { product } });
@@ -26,6 +27,7 @@ function Product(props) {
     }
   };
 
+  // Format price to LKR currency
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-LK', {
       style: 'currency',

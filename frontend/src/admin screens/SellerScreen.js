@@ -3,16 +3,14 @@ import axios from 'axios';
 import { Store } from '../Store';
 import { getError } from '../utils';
 import LoadingBox from '../components/LoadingBox';
-//import Button from 'react-bootstrap/Button';
 import MessageBox from '../components/MessageBox';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-
 import Table from 'react-bootstrap/Table';
-//import Card from 'react-bootstrap/Card';
 import Chart from 'react-google-charts';
 import { useNavigate } from 'react-router-dom';
 
+// Reducer function to handle different action types
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -32,6 +30,7 @@ const reducer = (state, action) => {
 
 export default function SellerScreen() {
   const navigate = useNavigate();
+  // useReducer hook to manage the component state
   const [{ loading, summary, error }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
@@ -39,6 +38,7 @@ export default function SellerScreen() {
   const { state } = useContext(Store);
   const { userInfo } = state;
 
+  // useEffect hook to fetch data when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {

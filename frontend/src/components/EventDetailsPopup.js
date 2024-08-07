@@ -3,13 +3,15 @@ import { Modal, Button } from 'react-bootstrap';
 import '../style/EventDetailsPopup.css'; // Import custom styles for the popup
 
 const EventDetailsPopup = ({ show, onClose, orders, selectedDate }) => {
+  // Filter orders by selected date
   const filteredOrders = orders.filter(
     (order) =>
       new Date(order.shippingAddress.date).toLocaleDateString() === selectedDate
   );
 
+  // Handle closing the popup
   const handleClosePopup = () => {
-    onClose(); // Close the popup
+    onClose();
   };
 
   return (
@@ -19,6 +21,7 @@ const EventDetailsPopup = ({ show, onClose, orders, selectedDate }) => {
       </Modal.Header>
       <Modal.Body>
         {filteredOrders.length > 0 ? (
+          // Display orders if found
           filteredOrders.map((order) => (
             <div key={order._id} className="order-details">
               <p>Time: {order.shippingAddress.time}</p>
@@ -30,6 +33,7 @@ const EventDetailsPopup = ({ show, onClose, orders, selectedDate }) => {
             </div>
           ))
         ) : (
+          // Display message if no orders found
           <p>No orders found for the selected date.</p>
         )}
       </Modal.Body>

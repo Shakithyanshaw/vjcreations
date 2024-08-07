@@ -17,27 +17,29 @@ export default function CartScreen() {
   const {
     cart: { cartItems },
   } = state;
-
+  // Function to update the quantity of an item in the cart
   const updateCartHandler = async (item, quantity) => {
     const { data } = await axios.get(`/api/products/${item._id}`);
     if (data.countInStock < quantity) {
       window.alert('Sorry, Product is Unavailable');
       return;
     }
+    // Dispatch action to update cart with new quantity
     ctxDispatch({
       type: 'CART_ADD_ITEM',
       payload: { ...item, quantity },
     });
   };
-
+  // Function to remove an item from the cart
   const removeItemHandler = (item) => {
     ctxDispatch({ type: 'CART_REMOVE_ITEM', payload: item });
   };
 
+  // Function to proceed to the checkout page
   const checkoutHandler = () => {
     navigate('/signin?redirect=/shipping');
   };
-
+  // Function to format price to Sri Lankan Rupees
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-LK', {
       style: 'currency',
@@ -53,7 +55,7 @@ export default function CartScreen() {
       <h2>My Cart</h2>
       <Row>
         <Col md={8}>
-          {cartItems.length === 0 ? (
+          {cartItems.length === 0 ? ( // Check if cart is empty
             <MessageBox>
               Dear valuable customer, Your Cart is empty.
               <Link to="/">Go to Shopping</Link>

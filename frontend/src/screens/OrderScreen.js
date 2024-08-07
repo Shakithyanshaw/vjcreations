@@ -19,6 +19,7 @@ import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+// Reducer function to manage state transitions
 function reducer(state, action) {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -56,6 +57,7 @@ export default function OrderScreen() {
   const { id: orderId } = params;
   const navigate = useNavigate();
 
+  // useReducer hook to manage complex state transitions
   const [
     {
       loading,
@@ -76,7 +78,7 @@ export default function OrderScreen() {
   });
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
-
+  // Helper function to format date
   function formatDate(isoString) {
     const options = {
       year: 'numeric',
@@ -88,6 +90,7 @@ export default function OrderScreen() {
     };
     return new Date(isoString).toLocaleDateString(undefined, options);
   }
+  // Helper function to format price
 
   function formatPrice(price) {
     return new Intl.NumberFormat('en-LK', {
@@ -95,7 +98,7 @@ export default function OrderScreen() {
       currency: 'LKR',
     }).format(price);
   }
-
+  // Function to create a PayPal order
   function createOrder(data, actions) {
     return actions.order
       .create({
@@ -109,7 +112,7 @@ export default function OrderScreen() {
         return orderID;
       });
   }
-
+  // Function to handle PayPal payment approval
   function onApprove(data, actions) {
     return actions.order.capture().then(async function (details) {
       try {
@@ -129,11 +132,11 @@ export default function OrderScreen() {
       }
     });
   }
-
+  // Function to handle PayPal payment errors
   function onError(err) {
     toast.error(getError(err));
   }
-
+  // useEffect hook to fetch order data and handle PayPal script loading
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -199,7 +202,7 @@ export default function OrderScreen() {
     successPay,
     successDeliver,
   ]);
-
+  // Function to handle order delivery
   async function deliverOrderHandler() {
     try {
       dispatch({ type: 'DELIVER_REQUEST' });
@@ -218,6 +221,7 @@ export default function OrderScreen() {
     }
   }
 
+  // Function to handle cash payment
   async function paymentOrderHandler() {
     try {
       dispatch({ type: 'PAY_REQUEST' });
@@ -236,6 +240,7 @@ export default function OrderScreen() {
     }
   }
 
+  // Function to handle printing the order
   const handlePrint = () => {
     window.print();
   };
@@ -245,6 +250,7 @@ export default function OrderScreen() {
   console.log('order.isPaid: ', order.isPaid);
   console.log('order.isDelivered: ', order.isDelivered);
 
+  // JSX to render the order details, payment, and delivery status
   return loading ? (
     <LoadingBox></LoadingBox>
   ) : error ? (

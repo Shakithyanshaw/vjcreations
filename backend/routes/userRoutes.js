@@ -8,6 +8,7 @@ import { sendProfileUpdateEmail } from '../emailprofile.js';
 
 const userRouter = express.Router();
 
+// Get all users - Admin only
 userRouter.get(
   '/',
   isAuth,
@@ -18,6 +19,7 @@ userRouter.get(
   })
 );
 
+// Get user by ID - Authenticated users
 userRouter.get(
   '/:id',
   isAuth,
@@ -31,6 +33,7 @@ userRouter.get(
   })
 );
 
+// Update user by ID - Admin only
 userRouter.put(
   '/:id',
   isAuth,
@@ -53,6 +56,7 @@ userRouter.put(
   })
 );
 
+// Delete user by ID - Admin only
 userRouter.delete(
   '/:id',
   isAuth,
@@ -77,6 +81,7 @@ userRouter.delete(
   })
 );
 
+// User sign-in
 userRouter.post(
   `/signin`,
   expressAsyncHandler(async (req, res) => {
@@ -100,6 +105,7 @@ userRouter.post(
   })
 );
 
+// User sign-up
 userRouter.post(
   `/signup`,
   expressAsyncHandler(async (req, res) => {
@@ -120,7 +126,7 @@ userRouter.post(
       mobileNo,
       city,
       address,
-      password: bcrypt.hashSync(password),
+      password: bcrypt.hashSync(password), // Hash the password before saving
     });
 
     // Save the new user
@@ -142,6 +148,7 @@ userRouter.post(
   })
 );
 
+// Update user profile - Authenticated users
 userRouter.put(
   '/profile/update',
   isAuth,

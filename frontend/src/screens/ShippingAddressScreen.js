@@ -20,7 +20,7 @@ export default function ShippingAddressScreen() {
   } = state;
 
   const [isNewAddress, setIsNewAddress] = useState(!shippingAddress);
-
+  // State management for form fields
   const [fullName, setFullName] = useState(
     isNewAddress ? '' : shippingAddress.fullName || ''
   );
@@ -41,11 +41,13 @@ export default function ShippingAddressScreen() {
       : new Date()
   );
 
+  // Hardcoded list of cities; can be replaced with dynamic data
   const cities = ['Jaffna'];
 
   const [postalCode, setPostalCode] = useState(
     isNewAddress ? '' : shippingAddress.postalCode || ''
   );
+  // Redirect to sign-in page if user is not logged in
   useEffect(() => {
     if (!userInfo) {
       navigate(`/signin?redirect=/shipping`);
@@ -76,6 +78,7 @@ export default function ShippingAddressScreen() {
       alert('You cannot choose a past time.');
       return;
     }
+    // Dispatch action to save shipping address and store it in localStorage
     ctxDispatch({
       type: 'SAVE_SHIPPING_ADDRESS',
       payload: {
@@ -102,7 +105,7 @@ export default function ShippingAddressScreen() {
     );
     navigate('/payment');
   };
-
+  // Toggle between using a new address and a saved address
   const handleNewAddressToggle = () => {
     setIsNewAddress(!isNewAddress);
     if (!isNewAddress) {

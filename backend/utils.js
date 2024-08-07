@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
-
+// Function to generate a JSON Web Token (JWT) for a user
+// This token will be used for authentication and authorization
 export const generateToken = (user) => {
   return jwt.sign(
     {
@@ -10,10 +11,12 @@ export const generateToken = (user) => {
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: '30d',
+      expiresIn: '30d', // Token expiration time (30 days)
     }
   );
 };
+// Middleware to check if a user is authenticated
+// This function checks for the presence of a valid JWT in the request headers
 
 export const isAuth = (req, res, next) => {
   const authorization = req.headers.authorization;
@@ -32,6 +35,8 @@ export const isAuth = (req, res, next) => {
   }
 };
 
+// Middleware to check if a user is an admin
+// This function ensures that the user has admin privileges
 export const isAdmin = (req, res, next) => {
   if (req.user && req.user.isAdmin) {
     next();

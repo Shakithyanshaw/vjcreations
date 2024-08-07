@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import axios from 'axios';
 import { getError } from '../utils';
 
+// Reducer function to handle state transitions
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -25,16 +26,16 @@ export default function OrderHistoryScreen() {
   const { state } = useContext(Store);
   const { userInfo } = state;
   const navigate = useNavigate();
-
+  // useReducer to manage complex state transitions
   const [{ loading, error, orders }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
     orders: [],
   });
-
+  // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
-
+  // useEffect to fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
       if (!userInfo) return;
@@ -57,11 +58,11 @@ export default function OrderHistoryScreen() {
     };
     fetchData();
   }, [userInfo]);
-
+  // Determine current orders to display based on pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
-
+  // Function to handle pagination
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
@@ -153,10 +154,10 @@ export default function OrderHistoryScreen() {
     </div>
   );
 }
-
+// Pagination component
 const Pagination = ({ itemsPerPage, totalItems, paginate }) => {
   const pageNumbers = [];
-
+  // Calculate total number of pages
   for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
     pageNumbers.push(i);
   }

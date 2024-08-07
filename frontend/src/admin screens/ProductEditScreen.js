@@ -14,6 +14,7 @@ import { toast } from 'react-toastify';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+// Reducer function to manage state changes based on dispatched actions
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -45,17 +46,19 @@ const reducer = (state, action) => {
 export default function ProductEditScreen() {
   const navigate = useNavigate();
   const [validated, setValidated] = useState(false);
-  const params = useParams(); // /product/:id
+  const params = useParams(); // Extracts parameters from the URL
   const { id: productId } = params;
 
   const { state } = useContext(Store);
   const { userInfo } = state;
+  // Initialize reducer state and set initial values
   const [{ loading, error, loadingUpdate, loadingUpload }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: '',
     });
 
+  // States for product details
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [price, setPrice] = useState('');
@@ -72,6 +75,7 @@ export default function ProductEditScreen() {
       try {
         dispatch({ type: 'FETCH_REQUEST' });
         const { data } = await axios.get(`/api/products/${productId}`);
+        // Populate state with fetched data
         setName(data.name);
         setSlug(data.slug);
         setPrice(data.price);
@@ -141,6 +145,7 @@ export default function ProductEditScreen() {
       });
       dispatch({ type: 'UPLOAD_SUCCESS' });
 
+      // Update image state based on upload type
       if (forImages) {
         setImages([...images, data.secure_url]);
       } else {
@@ -154,6 +159,7 @@ export default function ProductEditScreen() {
   };
 
   const deleteFileHandler = async (fileName, f) => {
+    // Remove image from state
     console.log(fileName, f);
     console.log(images);
     console.log(images.filter((x) => x !== fileName));

@@ -41,19 +41,32 @@ export default function SignupScreen() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
 
+  // Validate name
   function validateName(name) {
-    const regex = /^[a-zA-Z\s]+$/;
+    const regex = /^[a-zA-Z\s]+$/; // At least 2 characters, alphabets and spaces
     return regex.test(name);
   }
-
+  // Validate email
   function validateEmail(email) {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email format validation
     return regex.test(email);
   }
-
+  // Validate mobile number
   function validateMobileNumber(number) {
-    const regex = /^[0-9]{10}$/;
+    const regex = /^[0-9]{10}$/; // Exactly 10 digits
     return regex.test(number);
+  }
+
+  // Validate address (non-empty)
+  //.../^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/
+  function validateAddress(address) {
+    return address.trim() !== ''; // Check if the address is not empty
+  }
+
+  // Validate city
+  function validateCity(city) {
+    const regex = /^[a-zA-Z\s]{2,}$/; // At least 2 characters, alphabets and spaces
+    return regex.test(city);
   }
 
   const submitHandler = async (e) => {
@@ -74,11 +87,13 @@ export default function SignupScreen() {
     } else if (!validateMobileNumber(mobileNo)) {
       toast.error('Phone number is not valid!');
       return;
-    } else if (address === '') {
+    } else if (!validateAddress(address)) {
       toast.error("Address can't be empty!");
       return;
-    } else if (!validateName(city)) {
-      toast.error('City should only contain alphabets and spaces!');
+    } else if (!validateCity(city)) {
+      toast.error(
+        'City should be at least 2 characters and only contain alphabets and spaces!'
+      );
       return;
     } else if (password !== confirmPassword) {
       toast.error('Passwords do not match');
@@ -102,7 +117,7 @@ export default function SignupScreen() {
       //toast.error("Please enter valid details !");
     }
   };
-
+  // Redirect if user is already signed in
   useEffect(() => {
     if (userInfo) {
       navigate(redirect);

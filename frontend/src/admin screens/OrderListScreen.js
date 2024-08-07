@@ -14,6 +14,7 @@ import Table from 'react-bootstrap/Table';
 import Badge from 'react-bootstrap/Badge';
 import '../style/print.css';
 
+// Reducer function to manage the different states of fetching and deleting orders
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -47,12 +48,14 @@ export default function OrderListScreen() {
   const navigate = useNavigate();
   const { state } = useContext(Store);
   const { userInfo } = state;
+  // Using useReducer to handle complex state logic
   const [{ loading, error, orders, loadingDelete, successDelete }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: '',
     });
 
+  // State for managing pagination
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
 
@@ -80,6 +83,7 @@ export default function OrderListScreen() {
     }
   }, [userInfo, successDelete]);
 
+  // Handler for deleting an order
   const deleteHandler = async (order) => {
     if (window.confirm('Are you sure to delete?')) {
       try {
@@ -98,6 +102,7 @@ export default function OrderListScreen() {
     }
   };
 
+  // Function to format dates in a consistent way
   const formatDate = (dateString) => {
     const options = {
       year: 'numeric',
@@ -109,6 +114,7 @@ export default function OrderListScreen() {
     return new Date(dateString).toLocaleString(undefined, options);
   };
 
+  // Calculate indices for the current page
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = orders
@@ -117,8 +123,10 @@ export default function OrderListScreen() {
         .slice(indexOfFirstOrder, indexOfLastOrder)
     : [];
 
+  // Pagination handler
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Print handler
   const handlePrint = () => {
     window.print();
   };
@@ -264,6 +272,7 @@ export default function OrderListScreen() {
   );
 }
 
+// Pagination component to handle page navigation
 const Pagination = ({ itemsPerPage, totalItems, paginate }) => {
   const pageNumbers = [];
 

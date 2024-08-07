@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import Badge from 'react-bootstrap/Badge';
 import Table from 'react-bootstrap/Table';
 
+// Reducer function to handle different action types
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -42,16 +43,19 @@ const reducer = (state, action) => {
   }
 };
 export default function UserListScreen() {
+  // useNavigate hook for navigation
   const navigate = useNavigate();
+
+  // useReducer hook to manage component state
   const [{ loading, error, users, loadingDelete, successDelete }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: '',
     });
-
+  // useContext to access global state
   const { state } = useContext(Store);
   const { userInfo } = state;
-
+  // useEffect to fetch users data when component mounts or after deletion
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -73,7 +77,7 @@ export default function UserListScreen() {
       fetchData();
     }
   }, [userInfo, successDelete]);
-
+  // Handler for deleting a user
   const deleteHandler = async (user) => {
     if (window.confirm('Are you sure to delete?')) {
       try {

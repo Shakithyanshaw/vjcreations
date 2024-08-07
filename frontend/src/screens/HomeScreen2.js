@@ -23,15 +23,16 @@ const reducer = (state, action) => {
 };
 
 function HomeScreen2() {
+  // useReducer to manage complex state transitions
   const [{ loading, error, products }, dispatch] = useReducer(logger(reducer), {
     products: [],
     loading: true,
     error: '',
   });
-
+  // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8;
-
+  // useEffect to fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
@@ -53,7 +54,7 @@ function HomeScreen2() {
   // Sort filtered products alphabetically by name
   filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
 
-  // Pagination logic
+  // Pagination logic to determine current products to show
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(
@@ -61,6 +62,7 @@ function HomeScreen2() {
     indexOfLastProduct
   );
 
+  // Function to handle pagination
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (

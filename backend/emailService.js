@@ -1,3 +1,4 @@
+//mail for order conformation
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -5,8 +6,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: '123@gmail.com',
-    pass: '123',
+    user: 'jeyakumarshakithyan@gmail.com',
+    pass: 'vsehajwjhikmuopb',
   },
 });
 

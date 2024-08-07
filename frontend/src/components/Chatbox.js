@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import '../style/Chatbox.css'; // Ensure this matches the exact filename
+import '../style/Chatbox.css';
 
 const Chatbox = () => {
   const [messages, setMessages] = useState([]);
   const [userMessage, setUserMessage] = useState('');
 
+  // Handle sending messages
   const handleSendMessage = async () => {
     if (!userMessage.trim()) return;
 
@@ -14,8 +15,28 @@ const Chatbox = () => {
     setUserMessage('');
 
     try {
-      if (userMessage.startsWith('/product')) {
-        const productName = userMessage.substring(9).trim(); // Assuming '/product' is the command
+      // Predefined responses for specific user messages
+      if (userMessage.toLowerCase().includes('hi')) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { sender: 'bot', text: 'How can I help you?' },
+        ]);
+      } else if (userMessage.toLowerCase().includes('show the products')) {
+        const response = await axios.get('/api/products');
+        if (response.data && response.data.length > 0) {
+          const productMessages = response.data.map((product) => ({
+            sender: 'bot',
+            text: `${product.name}: $${product.price}`,
+          }));
+          setMessages((prevMessages) => [...prevMessages, ...productMessages]);
+        } else {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { sender: 'bot', text: 'No products available.' },
+          ]);
+        }
+      } else if (userMessage.startsWith('/product')) {
+        const productName = userMessage.substring(9).trim(); // Extract product name from message
         const response = await axios.get(
           `/api/products/searchByName/${productName}`
         );
@@ -34,6 +55,7 @@ const Chatbox = () => {
           ]);
         }
       } else {
+        // General message handling
         const response = await axios.post('/api/chat', {
           message: userMessage,
         });
@@ -54,6 +76,7 @@ const Chatbox = () => {
     }
   };
 
+  // Handle Enter key press to send message
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSendMessage();

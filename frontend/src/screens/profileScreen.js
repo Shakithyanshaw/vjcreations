@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { getError } from '../utils';
 import axios from 'axios';
 
+// Reducer function to handle profile update states
 const reducer = (state, action) => {
   switch (action.type) {
     case 'UPDATE_REQUEST':
@@ -21,8 +22,10 @@ const reducer = (state, action) => {
 };
 
 export default function ProfileScreen() {
+  // Extract user info and dispatch from context
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
+  // Initialize state variables for user profile details and form inputs
   const [name, setName] = useState(userInfo ? userInfo.name : '');
   const [email, setEmail] = useState(userInfo ? userInfo.email : '');
   const [mobileNo, setMobileNo] = useState(userInfo ? userInfo.mobileNo : '');
@@ -31,18 +34,26 @@ export default function ProfileScreen() {
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
+  // State and dispatch for handling profile update status
   const [{ loadingUpdate }, dispatch] = useReducer(reducer, {
     loadingUpdate: false,
   });
 
+  // Handle form submission for profile update
   const submitHandler = async (e) => {
     e.preventDefault();
+    // Check if passwords match
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
+    // If either password or confirm password is filled but the other is not, show an error
+    if ((password && !confirmPassword) || (!password && confirmPassword)) {
+      toast.error('Both password fields must be filled');
+      return;
+    }
     try {
+      // Send updated profile data to the server
       const { data } = await axios.put(
         '/api/users/profile/update', // Update endpoint URL
         {
@@ -57,6 +68,7 @@ export default function ProfileScreen() {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         }
       );
+      // Dispatch action to update user info in context
       dispatch({
         type: 'UPDATE_SUCCESS',
       });

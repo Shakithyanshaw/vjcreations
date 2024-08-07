@@ -9,6 +9,7 @@ import { sendOrderDeletionEmail } from '../sendOrderDeletionEmail.js';
 
 const orderRouter = express.Router();
 
+// Route to get all orders. Accessible only to authenticated admins.
 orderRouter.get(
   '/',
   isAuth,
@@ -19,6 +20,7 @@ orderRouter.get(
   })
 );
 
+//Route to create a new order. Accessible only to authenticated users.
 orderRouter.post(
   '/',
   isAuth,
@@ -41,11 +43,13 @@ orderRouter.post(
   })
 );
 
+//Route to get sales and order statistics for sellers. Accessible only to authenticated admins.
 orderRouter.get(
   '/seller',
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
+    // Aggregate data to get total sales by brand
     const productSalesByBrand = await Order.aggregate([
       {
         $group: {
@@ -54,7 +58,7 @@ orderRouter.get(
         },
       },
     ]);
-
+    // Aggregate data to get the count of products by brand
     const productBrands = await Product.aggregate([
       {
         $group: {
@@ -63,6 +67,7 @@ orderRouter.get(
         },
       },
     ]);
+    // Aggregate data to get the total sales by brand from order items
     const salesByBrand = await Order.aggregate([
       {
         $unwind: '$orderItems',
@@ -85,7 +90,7 @@ orderRouter.get(
         },
       },
     ]);
-
+    // Aggregate data to get total sales by brand from product orders
     const brandSales = await Product.aggregate([
       {
         $lookup: {
@@ -105,7 +110,7 @@ orderRouter.get(
         },
       },
     ]);
-
+    // Aggregate data to get total sales and details of orders by brand
     const ordersByBrand = await Order.aggregate([
       {
         $lookup: {
@@ -144,11 +149,17 @@ orderRouter.get(
   })
 );
 
+/**
+ * Route to get a summary of orders, payments, and users.
+ * Accessible only to authenticated admins.
+ */
+
 orderRouter.get(
   '/summary',
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
+    // Aggregate data to get total number of orders and total sales
     const orders = await Order.aggregate([
       {
         $group: {
@@ -158,7 +169,7 @@ orderRouter.get(
         },
       },
     ]);
-
+    // Aggregate data to get undelivered orders
     const UndeliverdOrders = await Order.aggregate([
       {
         $match: {
@@ -173,7 +184,7 @@ orderRouter.get(
         },
       },
     ]);
-
+    // Aggregate data to get unpaid orders
     const UnPaidOrders = await Order.aggregate([
       {
         $match: {
@@ -188,7 +199,7 @@ orderRouter.get(
         },
       },
     ]);
-
+    // Aggregate data to get orders and sales by payment method (PayPal)
     const Paypalorders = await Order.aggregate([
       {
         $match: { paymentMethod: 'PayPal' },
@@ -201,6 +212,7 @@ orderRouter.get(
         },
       },
     ]);
+    // Aggregate data to get orders and sales by payment method (COD)
     const CODorders = await Order.aggregate([
       {
         $match: { paymentMethod: 'COD' },
@@ -213,7 +225,7 @@ orderRouter.get(
         },
       },
     ]);
-
+    // Aggregate data to get the total number of users
     const users = await User.aggregate([
       {
         $group: {
@@ -222,7 +234,7 @@ orderRouter.get(
         },
       },
     ]);
-
+    // Aggregate data to get the number of users by city
     const usersByCity = await User.aggregate([
       {
         $group: {
@@ -231,7 +243,7 @@ orderRouter.get(
         },
       },
     ]);
-
+    // Aggregate data to get daily orders and sales
     const dailyOrders = await Order.aggregate([
       {
         $group: {
@@ -240,9 +252,9 @@ orderRouter.get(
           sales: { $sum: '$totalPrice' },
         },
       },
-      { $sort: { _id: 1 } },
+      { $sort: { _id: 1 } }, // Sort by date in ascending order
     ]);
-
+    // Aggregate data to get the number of orders by shipping city
     const ordersByCity = await Order.aggregate([
       {
         $group: {
@@ -250,9 +262,9 @@ orderRouter.get(
           count: { $sum: 1 },
         },
       },
-      { $sort: { count: -1 } },
+      { $sort: { count: -1 } }, // Sort by count in descending order
     ]);
-
+    // Aggregate data to get daily order count
     const dailyOrdersCount = await Order.aggregate([
       {
         $group: {
@@ -260,9 +272,9 @@ orderRouter.get(
           orders: { $sum: 1 },
         },
       },
-      { $sort: { _id: 1 } },
+      { $sort: { _id: 1 } }, // Sort by date in ascending order
     ]);
-
+    // Aggregate data to get monthly orders and sales
     const monthlyOrders = await Order.aggregate([
       {
         $group: {
@@ -271,9 +283,9 @@ orderRouter.get(
           sales: { $sum: '$totalPrice' },
         },
       },
-      { $sort: { _id: 1 } },
+      { $sort: { _id: 1 } }, // Sort by month in ascending order
     ]);
-
+    // Aggregate data to get monthly order count
     const monthlyOrderCount = await Order.aggregate([
       {
         $group: {
@@ -281,9 +293,9 @@ orderRouter.get(
           orders: { $sum: 1 },
         },
       },
-      { $sort: { _id: 1 } },
+      { $sort: { _id: 1 } }, // Sort by month in ascending order
     ]);
-
+    // Aggregate data to get yearly orders and sales
     const yearlyOrders = await Order.aggregate([
       {
         $group: {
@@ -292,9 +304,9 @@ orderRouter.get(
           sales: { $sum: '$totalPrice' },
         },
       },
-      { $sort: { _id: 1 } },
+      { $sort: { _id: 1 } }, // Aggregate data to get yearly order count
     ]);
-
+    // Aggregate data to get yearly order count
     const yearlyOrderCount = await Order.aggregate([
       {
         $group: {
@@ -302,9 +314,9 @@ orderRouter.get(
           orders: { $sum: 1 },
         },
       },
-      { $sort: { _id: 1 } },
+      { $sort: { _id: 1 } }, // Sort by year in ascending order
     ]);
-
+    // Aggregate data to get product categories and their counts
     const productCategories = await Product.aggregate([
       {
         $group: {
@@ -313,6 +325,7 @@ orderRouter.get(
         },
       },
     ]);
+    // Aggregate data to get top-selling products
     const topSellingProducts = await Order.aggregate([
       { $unwind: '$orderItems' },
       {
@@ -325,7 +338,7 @@ orderRouter.get(
       { $sort: { totalSales: -1 } },
       { $limit: 10 },
     ]);
-
+    // Aggregate data to get monthly COD orders
     const monthlyCODOrders = await Order.aggregate([
       {
         $match: {
@@ -366,6 +379,10 @@ orderRouter.get(
   })
 );
 
+/**
+ * Route to get the logged-in user's orders.
+ * Accessible only to authenticated users.
+ */
 orderRouter.get(
   '/mine',
   isAuth,
@@ -375,6 +392,10 @@ orderRouter.get(
   })
 );
 
+/**
+ * Route to get a specific order by ID.
+ * Accessible only to authenticated users.
+ */
 orderRouter.get(
   '/:id',
   isAuth,
@@ -388,6 +409,10 @@ orderRouter.get(
   })
 );
 
+/**
+ * Route to mark an order as delivered.
+ * Accessible only to authenticated users.
+ */
 orderRouter.put(
   '/:id/deliver',
   isAuth,
@@ -404,6 +429,10 @@ orderRouter.put(
   })
 );
 
+/**
+ * Route to mark an order as paid (cash payment).
+ * Accessible only to authenticated users.
+ */
 orderRouter.put(
   '/:id/paycash',
   isAuth,
@@ -426,6 +455,10 @@ orderRouter.put(
   })
 );
 
+/**
+ * Route to mark an order as paid (online payment).
+ * Accessible only to authenticated users.
+ */
 orderRouter.put(
   '/:id/pay',
   isAuth,
@@ -450,6 +483,10 @@ orderRouter.put(
   })
 );
 
+/**
+ * Route to delete an order.
+ * Accessible only to authenticated admins.
+ */
 orderRouter.delete(
   '/:id',
   isAuth,

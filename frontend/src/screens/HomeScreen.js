@@ -12,6 +12,7 @@ import Chatbox from '../components/Chatbox';
 import Modal from 'react-bootstrap/Modal';
 import { FaComments } from 'react-icons/fa';
 
+// Reducer function to handle state transitions
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -26,6 +27,7 @@ const reducer = (state, action) => {
 };
 
 function HomeScreen() {
+  // useReducer to manage complex state transitions
   const [{ loading, error, products }, dispatch] = useReducer(logger(reducer), {
     products: [],
     loading: true,
@@ -35,7 +37,7 @@ function HomeScreen() {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8;
   const [showChatbox, setShowChatbox] = useState(false);
-
+  // useEffect to fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
@@ -57,16 +59,16 @@ function HomeScreen() {
   // Sort filtered products alphabetically by name
   filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
 
-  // Pagination logic
+  // Pagination logic to determine current products to show
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
-
+  // Function to handle pagination
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
+  // Functions to handle chatbox visibility
   const handleShowChatbox = () => setShowChatbox(true);
   const handleCloseChatbox = () => setShowChatbox(false);
 

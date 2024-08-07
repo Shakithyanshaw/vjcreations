@@ -1,3 +1,4 @@
+//mail for delete the orders
 import nodemailer from 'nodemailer';
 
 // Email setup
@@ -6,8 +7,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: '123@gmail.com',
-    pass: '123', // App password if 2-Step Verification is enabled
+    user: 'jeyakumarshakithyan@gmail.com',
+    pass: 'vsehajwjhikmuopb', // App password if 2-Step Verification is enabled
   },
 });
 

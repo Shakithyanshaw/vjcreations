@@ -10,6 +10,7 @@ import { Store } from '../Store';
 import EventDetailsPopup from '../components/EventDetailsPopup';
 import '../style/AdminCalendarScreen.css';
 
+// Reducer function to handle state transitions
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
@@ -32,6 +33,7 @@ export default function AdminCalendarScreen() {
     orders: [],
   });
 
+  // Fetch orders from the server
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
@@ -50,6 +52,7 @@ export default function AdminCalendarScreen() {
     fetchData();
   }, [userInfo.token]);
 
+  // Filter upcoming orders
   const upcomingOrders = orders?.filter((order) => {
     const eventDate = new Date(order.shippingAddress.date);
     return !order.isDelivered && eventDate >= new Date();
@@ -58,15 +61,18 @@ export default function AdminCalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDetailsPopup, setShowDetailsPopup] = useState(false);
 
+  // Handle date tile click in calendar
   const handleTileClick = (date) => {
     setSelectedDate(date); // Update selectedDate with Date object
     setShowDetailsPopup(true);
   };
 
+  // Close the details popup
   const handleCloseDetailsPopup = () => {
     setShowDetailsPopup(false);
   };
 
+  // Add event dots on calendar tiles
   const tileContent = ({ date, view }) => {
     if (view === 'month') {
       const hasDelivery = upcomingOrders.some(
