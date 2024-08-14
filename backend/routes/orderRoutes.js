@@ -20,6 +20,37 @@ orderRouter.get(
   })
 );
 
+// Route to check product availability based on order count for a specific date
+orderRouter.post(
+  '/check-availability',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const { productId, selectedDate } = req.body;
+
+    // Ensure selectedDate is in the correct format, e.g., YYYY-MM-DD
+    const date = new Date(selectedDate);
+    if (isNaN(date.getTime())) {
+      return res.status(400).send({ message: 'Invalid date format' });
+    }
+
+    // Count how many times the user has ordered the same product on the selected date
+    const count = await Order.countDocuments({
+      'orderItems.product': productId,
+      deliveredAt: {
+        $gte: date,
+        $lt: new Date(date.getTime() + 24 * 60 * 60 * 1000),
+      },
+      user: req.user._id,
+    });
+
+    if (count >= 3) {
+      res.send({ isAvailable: false });
+    } else {
+      res.send({ isAvailable: true });
+    }
+  })
+);
+
 //Route to create a new order. Accessible only to authenticated users.
 orderRouter.post(
   '/',

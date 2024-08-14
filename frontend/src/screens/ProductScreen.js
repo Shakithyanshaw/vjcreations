@@ -141,6 +141,25 @@ function ProductScreen() {
       dispatch({ type: 'CREATE_FAIL' });
     }
   };
+
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [availabilityStatus, setAvailabilityStatus] = useState('');
+
+  const checkAvailabilityHandler = async () => {
+    try {
+      const { data } = await axios.post(
+        `/api/orders/check-availability`,
+        { productId: product._id, selectedDate },
+        {
+          headers: { Authorization: `Bearer ${userInfo.token}` },
+        }
+      );
+      setAvailabilityStatus(data.isAvailable ? 'Available' : 'Not Available');
+    } catch (error) {
+      toast.error(getError(error));
+    }
+  };
+
   // Book service handler for services type product
   const bookServiceHandler = () => {
     if (!userInfo) {
@@ -178,7 +197,10 @@ function ProductScreen() {
           <Button onClick={addToCartHandler}>Add to Cart</Button>
         </div>
       );
-    } else if (product.type === 'service') {
+    } else if (
+      product.type === 'service' &&
+      availabilityStatus === 'Available'
+    ) {
       return (
         <div className="d-grid">
           <Button onClick={bookServiceHandler}>Book Now</Button>
@@ -263,6 +285,41 @@ function ProductScreen() {
                   <Row>
                     <Col>Price:</Col>
                     <Col>{formatPrice(product.price)}</Col>
+                  </Row>
+                  <Row>
+                    <ListGroup.Item>
+                      {product.type === 'service' && (
+                        <Form.Group controlId="availabilityDate">
+                          <Form.Label>Check availability</Form.Label>
+                          <ReactDatePicker
+                            selected={selectedDate}
+                            onChange={(date) => setSelectedDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            minDate={new Date()}
+                            placeholderText="Select a date"
+                            className="form-control"
+                          />
+                          <Button
+                            className="mt-3"
+                            onClick={checkAvailabilityHandler}
+                            disabled={!selectedDate}
+                          >
+                            Check
+                          </Button>
+                          {availabilityStatus && (
+                            <div
+                              className={`mt-2 alert alert-${
+                                availabilityStatus === 'Available'
+                                  ? 'success'
+                                  : 'danger'
+                              }`}
+                            >
+                              {availabilityStatus}
+                            </div>
+                          )}
+                        </Form.Group>
+                      )}
+                    </ListGroup.Item>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
