@@ -149,11 +149,6 @@ function ProductScreen() {
     }
 
     if (product && product.type === 'service') {
-      if (selectedDate && !isAvailable(selectedDate)) {
-        toast.error('This service is not available on the selected date.');
-        return;
-      }
-
       const existItem =
         cart && cart.cartItems.find((x) => x.id === product._id);
       const quantity = existItem ? existItem.quantity + 1 : 1;
@@ -192,31 +187,6 @@ function ProductScreen() {
     }
   };
 
-  const [selectedDate, setSelectedDate] = useState(null);
-
-  // Handle date change for booking services
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
-  // Check if the selected date is within the next seven days
-  const isAvailable = (selectedDate) => {
-    const currentDate = new Date();
-    const nextSevenDates = [...Array(7)].map((_, index) => {
-      const date = new Date();
-      date.setDate(currentDate.getDate() + index);
-      return date;
-    });
-
-    return nextSevenDates.some((date) => isSameDay(date, selectedDate));
-  };
-  // Check if two dates are the same day
-  const isSameDay = (date1, date2) => {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  };
   // Format price to currency format
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-LK', {
@@ -296,28 +266,6 @@ function ProductScreen() {
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  <Col>
-                    {product.type === 'service' && (
-                      <div>
-                        <h5>Check Availability</h5>
-                        <ReactDatePicker
-                          style={{ width: '100px', fontSize: '14px' }}
-                          selected={selectedDate}
-                          onChange={handleDateChange}
-                          minDate={new Date()}
-                        />
-                        {selectedDate && (
-                          <div>
-                            {isAvailable(selectedDate) ? (
-                              <Badge bg="success">Available</Badge>
-                            ) : (
-                              <Badge bg="danger">Unavailable</Badge>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </Col>
                   <Col>
                     {product.type === 'product' && (
                       <div>
