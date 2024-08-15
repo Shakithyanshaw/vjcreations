@@ -20,44 +20,66 @@ orderRouter.get(
   })
 );
 
-// Route to check product availability based on order count for a specific date
 orderRouter.post(
   '/check-availability',
   isAuth,
   expressAsyncHandler(async (req, res) => {
-    const { productId, selectedDate } = req.body;
+    try {
+      const { productId, selectedDate } = req.body;
 
-    // Ensure selectedDate is in the correct format, e.g., YYYY-MM-DD
-    const date = new Date(selectedDate);
-    if (isNaN(date.getTime())) {
-      return res.status(400).send({ message: 'Invalid date format' });
-    }
+      if (!productId || !selectedDate) {
+        return res
+          .status(400)
+          .send({ message: 'Product ID and date are required' });
+      }
 
-    // Count how many times the user has ordered the same product on the selected date
-    const count = await Order.countDocuments({
-      'orderItems.product': productId,
-      deliveredAt: {
-        $gte: date,
-        $lt: new Date(date.getTime() + 24 * 60 * 60 * 1000),
-      },
-      user: req.user._id,
-    });
+      // Ensure selectedDate is in ISO format
+      const date = new Date(selectedDate);
+      if (isNaN(date.getTime())) {
+        return res.status(400).send({ message: 'Invalid date format' });
+      }
 
-    if (count >= 3) {
-      res.send({ isAvailable: false });
-    } else {
-      res.send({ isAvailable: true });
+      // Check if the product exists
+      const product = await Product.findById(productId);
+      if (!product) {
+        return res.status(404).send({ message: 'Product not found' });
+      }
+
+      // Define the start and end of the day in UTC
+      const startOfDay = new Date(
+        Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+      );
+      const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+
+      // Count how many times the product has been ordered on the selected date
+      const count = await Order.countDocuments({
+        'orderItems.product': productId,
+        'shippingAddress.date': {
+          $gte: startOfDay.toISOString(),
+          $lt: endOfDay.toISOString(),
+        },
+      });
+
+      // Return availability status
+      const isAvailable = count < 2;
+      res.send({ isAvailable });
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      res.status(500).send({ message: 'Server error' });
     }
   })
 );
 
-//Route to create a new order. Accessible only to authenticated users.
+// Route to create a new order. Accessible only to authenticated users.
 orderRouter.post(
   '/',
   isAuth,
   expressAsyncHandler(async (req, res) => {
+    const orderItems = req.body.orderItems;
+
+    // Create a new order
     const newOrder = new Order({
-      orderItems: req.body.orderItems.map((x) => ({ ...x, product: x._id })),
+      orderItems: orderItems.map((x) => ({ ...x, product: x._id })),
       shippingAddress: req.body.shippingAddress,
       paymentMethod: req.body.paymentMethod,
       itemsPrice: req.body.itemsPrice,
@@ -67,9 +89,19 @@ orderRouter.post(
       user: req.user._id,
     });
 
+    // Save the order
     const order = await newOrder.save();
+
+    // Update the stock count for each product in the order
+    for (const item of orderItems) {
+      await Product.findByIdAndUpdate(item._id, {
+        $inc: { countInStock: -item.quantity }, // Decrease stock count
+      });
+    }
+
     // After creating the order, send confirmation email
     await sendOrderConfirmationEmail(req.user.email, req.user.name, newOrder);
+
     res.status(201).send({ message: 'New Order Created', order });
   })
 );

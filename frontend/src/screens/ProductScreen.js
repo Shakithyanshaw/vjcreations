@@ -146,10 +146,12 @@ function ProductScreen() {
   const [availabilityStatus, setAvailabilityStatus] = useState('');
 
   const checkAvailabilityHandler = async () => {
+    if (!selectedDate) return; // Prevent request if no date selected
+
     try {
       const { data } = await axios.post(
         `/api/orders/check-availability`,
-        { productId: product._id, selectedDate },
+        { productId: product._id, selectedDate: selectedDate.toISOString() }, // Convert date to ISO string
         {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         }
@@ -157,6 +159,7 @@ function ProductScreen() {
       setAvailabilityStatus(data.isAvailable ? 'Available' : 'Not Available');
     } catch (error) {
       toast.error(getError(error));
+    } finally {
     }
   };
 
@@ -302,9 +305,9 @@ function ProductScreen() {
                           <Button
                             className="mt-3"
                             onClick={checkAvailabilityHandler}
-                            disabled={!selectedDate}
+                            disabled={!selectedDate || loading} // Disable if no date or loading
                           >
-                            Check
+                            {loading ? 'Checking...' : 'Check'}
                           </Button>
                           {availabilityStatus && (
                             <div
