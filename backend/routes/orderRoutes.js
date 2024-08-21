@@ -45,11 +45,12 @@ orderRouter.post(
         return res.status(404).send({ message: 'Product not found' });
       }
 
-      // Define the start and end of the day in UTC
+      // Define the start and end of the day without considering the time
       const startOfDay = new Date(
         Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
       );
-      const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+      const endOfDay = new Date(startOfDay);
+      endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
 
       // Count how many times the product has been ordered on the selected date
       const count = await Order.countDocuments({
